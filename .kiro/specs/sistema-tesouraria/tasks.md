@@ -1,0 +1,367 @@
+# Plano de Implementação: Sistema Tesouraria
+
+## Visão Geral
+
+Implementação full-stack em TypeScript/NuxtJS 3 com PostgreSQL, daisyUI (tema emerald), Docker Compose (dev + prod), integração SISGRU e módulo de reprografia. Todos os comandos devem ser executados via `docker compose exec` ou `docker compose run` conforme steering docker-dev.md.
+
+## Tarefas
+
+- [x] 1. Infraestrutura Docker Compose e configuração base
+  - [x] 1.1 Criar `docker-compose.yml` (dev) com serviços: nginx, nuxt, postgres, pgadmin
+    - Nginx nas portas 80/443, Nuxt na 3000 interna, PostgreSQL na 5432 interna, pgAdmin na 5050
+    - Volume nomeado `postgres_data` para persistência do PostgreSQL
+    - _Requisitos: 6.1, 6.2, 6.5_
+  - [x] 1.2 Criar `docker-compose.prod.yml` com override de produção
+    - Desabilitar pgAdmin, usar `nuxt build` + `nuxt start`, montar `./ssl/prod/`
+    - _Requisitos: 6.3, 6.7_
+  - [x] 1.3 Criar configuração Nginx com SSL termination
+    - `nginx/nginx.conf` com upstream para Nuxt, redirect HTTP→HTTPS
+    - Script de geração de certificado autoassinado para dev em `ssl/dev/`
+    - _Requisitos: 6.2, 6.3, 6.4_
+  - [x] 1.4 Criar `.gitignore` protegendo arquivos sensíveis
+    - Incluir: `.env*`, `ssl/`, `*.pem`, `*.key`, `*.p12`, `node_modules/`, `.nuxt/`, `dist/`
+    - _Requisitos: 6.6_
+  - [x] 1.5 Criar `.env.example` com todas as variáveis necessárias documentadas
+    - Incluir: `DATABASE_URL`, `JWT_SECRET`, `SISGRU_*`, `PGADMIN_*`
+    - _Requisitos: 6.1, 7.1_
+
+- [x] 2. Projeto NuxtJS — estrutura base e dependências
+  - [x] 2.1 Inicializar projeto NuxtJS 3 com TypeScript e instalar dependências
+    - `nuxt`, `@nuxtjs/tailwindcss`, `daisyui`, `pg`, `bcryptjs`, `jsonwebtoken`, `zod`, `node-cron`, `xml2js`, `fast-check`, `vitest`
+    - Executar via: `docker compose run --rm nuxt npx nuxi init` e `docker compose exec nuxt npm install`
+    - _Requisitos: 6.1_
+  - [x] 2.2 Configurar `nuxt.config.ts` com Tailwind/daisyUI tema emerald, módulos e runtime config
+    - Definir `runtimeConfig` para variáveis de ambiente do servidor
+    - _Requisitos: 11.3_
+  - [x] 2.3 Criar camada de acesso ao banco (`server/utils/db.ts`)
+    - Pool de conexões `pg`, função `query<T>(sql, params)` e `transaction<T>(fn)`
+    - Garantir que nenhuma query use interpolação de strings
+    - _Requisitos: 5.2_
+
+
+- [x] 3. Banco de dados — migrations e seed inicial
+  - [x] 3.1 Criar migration `001_auth.sql` com tabelas de autenticação e RBAC
+    - Tabelas: `usuarios`, `grupos`, `permissoes`, `usuario_grupos`, `grupo_permissoes`, `sessoes`
+    - Índices em `usuarios.email`, `sessoes.token_hash`, `sessoes.expira_em`
+    - _Requisitos: 1.5, 1.6, 3.6_
+  - [x] 3.2 Criar migration `002_sisgru.sql` com tabelas SISGRU
+    - Tabelas: `sisgru_grus` (todos os campos do modelo), `sisgru_pagamentos` (incluindo `ticket_retirado`, `ticket_retirado_em`, `ticket_retirado_por`)
+    - _Requisitos: 7.5, 15.5_
+  - [x] 3.3 Criar migration `003_sisgru_sync_log.sql`
+    - Tabela `sisgru_sync_log` com campos: `id`, `tipo`, `iniciado_em`, `finalizado_em`, `qtd_novos`, `qtd_total`, `status`, `mensagem_erro`
+    - _Requisitos: 7.6_
+  - [x] 3.4 Criar migration `004_reprografia.sql`
+    - Tabelas: `reprografia_creditos`, `reprografia_usos`, `reprografia_config`
+    - Registro inicial em `reprografia_config`: `('valor_por_copia', '0.10', 'Valor cobrado por cópia em R$')`
+    - _Requisitos: 16.1, 17.6, 18.1_
+  - [x] 3.5 Criar script de seed (`server/db/seed.sql`) com usuário admin e grupos/permissões iniciais
+    - Grupos: `admin`, `tesoureiro`, `reprografia`; permissões para cada rota protegida
+    - _Requisitos: 3.6, 4.1_
+  - [x] 3.6 Criar script `server/db/migrate.ts` para executar migrations em ordem
+    - Executar via: `docker compose exec nuxt npx tsx server/db/migrate.ts`
+    - _Requisitos: 6.1_
+
+- [x] 4. Autenticação — API Routes e middleware
+  - [x] 4.1 Criar `server/utils/jwt.ts` — geração e validação de JWT HS256
+    - Funções: `signJwt(payload)`, `verifyJwt(token)` com tipagem `JWTPayload`
+    - _Requisitos: 1.1_
+  - [x] 4.2 Criar `server/utils/session.ts` — gerenciamento de sessões no banco
+    - Funções: `createSession(userId, ip)`, `validateSession(tokenHash)`, `invalidateSession(tokenHash)`
+    - Armazenar apenas hash SHA-256 do JWT em `sessoes.token_hash`
+    - _Requisitos: 1.6, 14.4_
+  - [x] 4.3 Criar `server/api/auth/login.post.ts`
+    - Validação Zod de `{ email, senha }`, query parametrizada, `bcrypt.compare`, geração JWT, Set-Cookie HttpOnly/Secure/SameSite=Strict
+    - Log de tentativa (sucesso/falha) com IP, sem senha ou token
+    - _Requisitos: 1.1, 1.2, 1.5, 1.8, 13.1, 14.1_
+  - [x] 4.4 Criar `server/api/auth/logout.post.ts`
+    - Invalidar sessão no banco, limpar cookie
+    - _Requisitos: 1.4_
+  - [x] 4.5 Criar `server/api/auth/me.get.ts`
+    - Retornar `{ id, nome, email, grupos }` do usuário autenticado
+    - _Requisitos: 1.3_
+  - [ ]* 4.6 Escrever testes unitários para `jwt.ts` e `session.ts`
+    - Testar geração/validação JWT, hash SHA-256, expiração de sessão
+    - _Requisitos: 1.6, 1.7_
+  - [ ]* 4.7 Escrever property test — Propriedade 4: Senhas nunca em texto plano
+    - **Propriedade 4: Senhas nunca armazenadas em texto plano**
+    - **Valida: Requisitos 1.5, 4.2**
+  - [ ]* 4.8 Escrever property test — Propriedade 5: Token armazenado como hash SHA-256
+    - **Propriedade 5: Token de sessão armazenado apenas como hash SHA-256**
+    - **Valida: Requisito 1.6**
+
+
+- [x] 5. Rate limiting de autenticação
+  - [x] 5.1 Criar `server/utils/rateLimiter.ts`
+    - Implementar contagem de tentativas por IP em memória (Map com TTL), limite de 5 falhas em 10 minutos, retorno HTTP 429 ao exceder
+    - _Requisitos: 2.1, 2.2, 2.3_
+  - [x] 5.2 Integrar rate limiter no `login.post.ts`
+    - Verificar limite antes de processar credenciais; incrementar contador apenas em falhas
+    - _Requisitos: 2.1, 2.3_
+  - [ ]* 5.3 Escrever property test — Propriedade 7: Rate limiting bloqueia após excesso de tentativas
+    - **Propriedade 7: Rate limiting bloqueia após excesso de tentativas falhas**
+    - **Valida: Requisitos 2.1, 2.2**
+
+- [x] 6. Middleware RBAC server-side
+  - [x] 6.1 Criar `server/middleware/auth.ts`
+    - Extrair JWT do cookie, verificar assinatura e expiração, rejeitar com 401 se inválido
+    - _Requisitos: 3.1, 3.3_
+  - [x] 6.2 Criar `server/utils/rbac.ts`
+    - Função `checkPermission(userId, permissao)` consultando banco via query parametrizada
+    - Helper `requirePermission(permissao)` para uso nas API Routes
+    - _Requisitos: 3.2, 3.4, 3.5_
+  - [ ]* 6.3 Escrever property test — Propriedade 8: RBAC bloqueia tokens inválidos com 401
+    - **Propriedade 8: RBAC bloqueia tokens inválidos com 401**
+    - **Valida: Requisitos 3.1, 3.3**
+  - [ ]* 6.4 Escrever property test — Propriedade 9: RBAC bloqueia usuários sem permissão com 403
+    - **Propriedade 9: RBAC bloqueia usuários sem permissão com 403**
+    - **Valida: Requisitos 3.2, 3.4, 4.4, 12.5**
+  - [ ]* 6.5 Escrever property test — Propriedade 10: Validação Zod rejeita entradas inválidas
+    - **Propriedade 10: Validação Zod rejeita entradas inválidas antes de qualquer query**
+    - **Valida: Requisitos 5.1, 5.3, 4.5, 12.6**
+  - [ ]* 6.6 Escrever property test — Propriedade 11: Queries parametrizadas neutralizam SQL Injection
+    - **Propriedade 11: Queries parametrizadas neutralizam SQL Injection**
+    - **Valida: Requisito 5.2**
+  - [ ]* 6.7 Escrever property test — Propriedade 12: Erros internos nunca expõem detalhes ao cliente
+    - **Propriedade 12: Erros internos nunca expõem detalhes ao cliente**
+    - **Valida: Requisitos 5.4, 13.3, 14.3**
+
+- [x] 7. Checkpoint — Autenticação e RBAC
+  - Garantir que todos os testes passem. Verificar via: `docker compose exec nuxt npx vitest --run`
+
+
+- [x] 8. API Routes de usuários e grupos (administração)
+  - [x] 8.1 Criar `server/api/usuarios/index.get.ts` e `server/api/usuarios/index.post.ts`
+    - GET: listar usuários (requer permissão `admin`); POST: criar usuário com bcrypt hash (custo 12)
+    - Validação Zod em ambos; queries parametrizadas
+    - _Requisitos: 4.1, 4.2, 4.4, 4.5_
+  - [x] 8.2 Criar `server/api/grupos/index.get.ts`
+    - Listar grupos com suas permissões (requer permissão `admin`)
+    - _Requisitos: 4.3, 4.4_
+  - [ ]* 8.3 Escrever testes unitários para rotas de usuários e grupos
+    - Testar criação com hash bcrypt, rejeição de não-admin, validação Zod
+    - _Requisitos: 4.2, 4.4, 4.5_
+
+- [x] 9. Layout principal e composables de autenticação
+  - [x] 9.1 Criar composable `composables/useAuth.ts`
+    - Implementar interface `UseAuth`: `user`, `isAuthenticated`, `login()`, `logout()`, `hasPermission()`
+    - Estado reativo via `useState`, chamadas para `/api/auth/me`, `/api/auth/login`, `/api/auth/logout`
+    - _Requisitos: 1.1, 1.3, 1.4, 11.2_
+  - [x] 9.2 Criar `layouts/default.vue` — layout autenticado
+    - Header (logo + nome do usuário + botão logout), Sidebar (menu filtrado por permissões), área de conteúdo (slot), Footer (versão)
+    - Tema daisyUI emerald aplicado globalmente
+    - _Requisitos: 11.1, 11.3, 11.5_
+  - [x] 9.3 Criar `layouts/auth.vue` — layout público
+    - Conteúdo centralizado, sem sidebar/header
+    - _Requisitos: 11.4_
+  - [x] 9.4 Criar componentes `components/AppHeader.vue`, `components/AppSidebar.vue`, `components/AppNavItem.vue`
+    - Sidebar filtra itens de menu com base em `useAuth().hasPermission()`
+    - _Requisitos: 11.1, 11.5_
+  - [x] 9.5 Criar middleware de rota Nuxt `middleware/auth.ts` (client-side)
+    - Redirecionar para `/login` se não autenticado; complementa o middleware server-side
+    - _Requisitos: 3.3, 9.6, 10.6_
+  - [ ]* 9.6 Escrever property test — Propriedade 22: Sidebar exibe apenas itens autorizados
+    - **Propriedade 22: Sidebar exibe apenas itens autorizados para o usuário**
+    - **Valida: Requisito 11.5**
+
+- [x] 10. Tela de login
+  - [x] 10.1 Criar `pages/login.vue` usando `layouts/auth.vue`
+    - Formulário com campos email e senha, botão de submit, exibição de erro genérico
+    - Chamar `useAuth().login()` e redirecionar para `/` em caso de sucesso
+    - _Requisitos: 1.1, 1.2, 11.4_
+  - [ ]* 10.2 Escrever property test — Propriedade 1: Autenticação válida produz cookie com flags de segurança
+    - **Propriedade 1: Autenticação válida sempre produz cookie com flags de segurança**
+    - **Valida: Requisitos 1.1, 13.1**
+  - [ ]* 10.3 Escrever property test — Propriedade 2: Credenciais inválidas sempre retornam 401 genérico
+    - **Propriedade 2: Credenciais inválidas sempre retornam 401 com mensagem genérica**
+    - **Valida: Requisitos 1.2, 1.8**
+  - [ ]* 10.4 Escrever property test — Propriedade 3: Login seguido de logout invalida sessão
+    - **Propriedade 3: Login seguido de logout invalida a sessão (round-trip)**
+    - **Valida: Requisitos 1.4, 11.2**
+  - [ ]* 10.5 Escrever property test — Propriedade 6: Sessões expiradas são sempre rejeitadas
+    - **Propriedade 6: Sessões expiradas são sempre rejeitadas**
+    - **Valida: Requisito 1.7**
+  - [ ]* 10.6 Escrever property test — Propriedade 23: Logs de autenticação nunca contêm senhas ou tokens
+    - **Propriedade 23: Logs de autenticação nunca contêm senhas ou tokens**
+    - **Valida: Requisito 14.1**
+  - [ ]* 10.7 Escrever property test — Propriedade 24: ip_origem sempre preenchido em novas sessões
+    - **Propriedade 24: ip_origem sempre preenchido em novas sessões**
+    - **Valida: Requisito 14.4**
+
+
+- [x] 11. Checkpoint — Layout, login e autenticação integrados
+  - Garantir que todos os testes passem. Verificar via: `docker compose exec nuxt npx vitest --run`
+
+- [x] 12. Integração SISGRU — serviço de sincronização
+  - [x] 12.1 Criar `server/utils/sisgruJwt.ts` — geração de JWT RS256 para SISGRU
+    - Ler chave privada RSA de `SISGRU_PRIVATE_KEY_PATH`, gerar JWT com `alg=RS256`, `exp = iat + 600`
+    - Verificar existência da chave na inicialização; logar erro crítico se ausente
+    - _Requisitos: 7.2, 7.8_
+  - [x] 12.2 Criar `server/utils/sisgruParser.ts` — parse de XML para objetos TypeScript
+    - Usar `xml2js` para converter XML → `SisgruGru[]` e `SisgruPagamento[]`
+    - Converter tipos corretamente (string, number, date, timestamp)
+    - Rejeitar XML malformado sem inserir registros parciais
+    - _Requisitos: 8.1, 8.2, 8.5_
+  - [x] 12.3 Criar `server/services/sisgruSync.ts` — serviço de sincronização
+    - Implementar `syncGrus(data)`, `syncPagamentos(data)`, `syncDia(data?)`
+    - `INSERT ... ON CONFLICT (id) DO NOTHING` para GRUs e Pagamentos
+    - Ao processar pagamentos com `servico_id = 16279`, acumular em `reprografia_creditos`
+    - Registrar cada execução em `sisgru_sync_log`; falha em um endpoint não cancela o outro
+    - _Requisitos: 7.3, 7.4, 7.5, 7.6, 7.7, 7.9, 16.1, 16.2, 16.3, 16.4, 16.5_
+  - [x] 12.4 Criar `server/plugins/sisgruCron.ts` — Nuxt Server Plugin com node-cron
+    - Agendar `syncDia()` com intervalo de `SISGRU_SYNC_INTERVAL_MINUTES` (padrão: 10)
+    - Verificar chave privada na inicialização; desabilitar cron se ausente
+    - _Requisitos: 7.1, 7.8_
+  - [ ]* 12.5 Escrever property test — Propriedade 13: JWT SISGRU sempre RS256 com exp de 10 min
+    - **Propriedade 13: JWT SISGRU sempre gerado com RS256 e expiração de 10 minutos**
+    - **Valida: Requisito 7.2**
+  - [ ]* 12.6 Escrever property test — Propriedade 14: Sincronização SISGRU é idempotente
+    - **Propriedade 14: Sincronização SISGRU é idempotente (deduplicação)**
+    - **Valida: Requisitos 7.5, 7.9**
+  - [ ]* 12.7 Escrever property test — Propriedade 15: Toda execução registrada na Sync_Log
+    - **Propriedade 15: Toda execução de sincronização é registrada na Sync_Log**
+    - **Valida: Requisitos 7.6, 14.2**
+  - [ ]* 12.8 Escrever property test — Propriedade 16: Falha em um endpoint não cancela o outro
+    - **Propriedade 16: Falha em um endpoint SISGRU não cancela o outro**
+    - **Valida: Requisito 7.7**
+  - [ ]* 12.9 Escrever property test — Propriedade 17: Round-trip parse/serialização preserva campos
+    - **Propriedade 17: Round-trip de parse/serialização SISGRU preserva todos os campos**
+    - **Valida: Requisitos 8.1, 8.2, 8.3, 8.4**
+  - [ ]* 12.10 Escrever property test — Propriedade 18: XML malformado não resulta em inserção parcial
+    - **Propriedade 18: XML malformado não resulta em inserção parcial**
+    - **Valida: Requisito 8.5**
+  - [ ]* 12.11 Escrever property test — Propriedade 27: Créditos de reprografia acumulam corretamente
+    - **Propriedade 27: Créditos de reprografia acumulam corretamente na sincronização**
+    - **Valida: Requisitos 16.1, 16.2**
+
+- [x] 13. API Routes SISGRU — listagem e sincronização manual
+  - [x] 13.1 Criar `server/api/sisgru/grus.get.ts`
+    - Validação Zod do parâmetro `data` (formato `DD/MM/YYYY`), query parametrizada em `sisgru_grus` por `dt_emissao`
+    - _Requisitos: 9.2, 12.1, 12.6_
+  - [x] 13.2 Criar `server/api/sisgru/pagamentos.get.ts`
+    - Validação Zod do parâmetro `data`, query parametrizada em `sisgru_pagamentos` por `data_alteracao_situacao_pag_tesouro`
+    - _Requisitos: 10.2, 12.2, 12.6_
+  - [x] 13.3 Criar `server/api/sisgru/pagamentos/[id]/ticket.patch.ts`
+    - Verificar existência, `servico_id = 14671` e `ticket_retirado = false`; atualizar com `ticket_retirado_em = NOW()` e `ticket_retirado_por = userId`
+    - Retornar HTTP 422 se condições não atendidas
+    - _Requisitos: 15.3, 15.4, 15.5, 15.6_
+  - [x] 13.4 Criar `server/api/sisgru/sync-log.get.ts` e `server/api/sisgru/sync.post.ts`
+    - Ambos requerem permissão `admin`; sync.post chama `sisgruSync.syncDia()`
+    - _Requisitos: 12.3, 12.4, 12.5_
+  - [ ]* 13.5 Escrever property test — Propriedade 19: Filtro por data retorna apenas registros da data
+    - **Propriedade 19: Filtro por data retorna apenas registros da data selecionada**
+    - **Valida: Requisitos 9.2, 10.2, 12.1, 12.2**
+  - [ ]* 13.6 Escrever property test — Propriedade 25: Marcação de ticket é idempotente e restrita ao serviço 14671
+    - **Propriedade 25: Marcação de ticket é idempotente e restrita ao serviço 14671**
+    - **Valida: Requisitos 15.4, 15.5, 15.6**
+  - [ ]* 13.7 Escrever property test — Propriedade 26: Marcação de ticket registra auditoria completa
+    - **Propriedade 26: Marcação de ticket registra auditoria completa**
+    - **Valida: Requisito 15.5**
+
+
+- [ ] 14. Telas SISGRU — GRUs e Pagamentos
+  - [x] 14.1 Criar componente `components/sisgru/FiltroData.vue`
+    - Seletor de data com padrão = hoje; emite evento `update:data` ao alterar
+    - _Requisitos: 9.5, 10.5_
+  - [x] 14.2 Criar componente `components/sisgru/TabelaGrus.vue`
+    - Colunas: ID, Nº RA, Recolhedor, Serviço, Tipo Serviço, Valor Total (R$), Situação, Dt. Emissão, Dt. Transferência, Agente Arrecadador, Meio Pagamento
+    - Rodapé com total de registros e soma de `vl_total`
+    - _Requisitos: 9.3, 9.4_
+  - [x] 14.3 Criar componente `components/sisgru/TabelaPagamentos.vue`
+    - Colunas conforme design; CPF mascarado `***.XXX.XXX-**`; badge colorido para situação (CO=verde, RE=amarelo)
+    - Coluna Ticket: botão "Marcar Retirada" ou badge "Retirado" com tooltip (data/hora + nome) apenas para `servico_id = 14671`
+    - Rodapé com total de registros e soma de `valor_total`
+    - _Requisitos: 10.3, 10.4, 15.1, 15.2, 15.7_
+  - [ ] 14.4 Criar `pages/grus/index.vue`
+    - Usar `Layout_Principal`; integrar `FiltroData` + `TabelaGrus`; chamar `GET /api/sisgru/grus?data=`
+    - _Requisitos: 9.1, 9.2, 9.5, 9.6_
+  - [ ] 14.5 Criar `pages/pagamentos/index.vue`
+    - Usar `Layout_Principal`; integrar `FiltroData` + `TabelaPagamentos`; chamar `GET /api/sisgru/pagamentos?data=`
+    - Ao clicar "Marcar Retirada", chamar `PATCH /api/sisgru/pagamentos/:id/ticket` e atualizar linha sem reload
+    - _Requisitos: 10.1, 10.2, 10.5, 10.6, 15.3_
+  - [ ]* 14.6 Escrever property test — Propriedade 20: Totalizadores calculados corretamente
+    - **Propriedade 20: Totalizadores calculados corretamente para qualquer conjunto de registros**
+    - **Valida: Requisitos 9.4, 10.4**
+  - [ ]* 14.7 Escrever property test — Propriedade 21: Máscara de CPF/CNPJ aplicada a todos os registros
+    - **Propriedade 21: Máscara de CPF/CNPJ aplicada a todos os registros de Pagamentos**
+    - **Valida: Requisito 10.3**
+
+- [ ] 15. API Routes de reprografia
+  - [ ] 15.1 Criar `server/api/reprografia/creditos.get.ts`
+    - Validação Zod do parâmetro `cpf`; query parametrizada em `reprografia_creditos`
+    - _Requisitos: 17.2, 17.3_
+  - [ ] 15.2 Criar `server/api/reprografia/usos.post.ts`
+    - Validação Zod de `{ cpf, num_copias }`; buscar `valor_por_copia` vigente de `reprografia_config`
+    - Verificar saldo suficiente; executar em transação: inserir em `reprografia_usos` e debitar `reprografia_creditos.saldo`
+    - Retornar HTTP 422 se saldo insuficiente
+    - _Requisitos: 17.5, 17.6, 17.8_
+  - [ ] 15.3 Criar `server/api/reprografia/usos.get.ts`
+    - Listar usos com filtros opcionais; ordenado por `registrado_em` DESC
+    - _Requisitos: 17.7_
+  - [ ] 15.4 Criar `server/api/reprografia/config.get.ts` e `server/api/reprografia/config.put.ts`
+    - GET: retornar configuração atual; PUT: validar valor positivo com Zod, atualizar com `atualizado_por = userId`
+    - PUT requer permissão `admin`
+    - _Requisitos: 18.1, 18.2, 18.3, 18.4_
+  - [ ]* 15.5 Escrever property test — Propriedade 28: Baixa nunca resulta em saldo negativo
+    - **Propriedade 28: Baixa de reprografia nunca resulta em saldo negativo**
+    - **Valida: Requisito 17.4**
+  - [ ]* 15.6 Escrever property test — Propriedade 29: Baixa de reprografia é atômica
+    - **Propriedade 29: Baixa de reprografia é atômica**
+    - **Valida: Requisitos 17.3, 17.5**
+  - [ ]* 15.7 Escrever property test — Propriedade 30: Snapshot do valor por cópia preservado no histórico
+    - **Propriedade 30: Snapshot do valor por cópia é preservado no histórico**
+    - **Valida: Requisitos 17.6, 18.5**
+
+- [ ] 16. Telas de reprografia
+  - [ ] 16.1 Criar componente `components/reprografia/ConsultaCpf.vue`
+    - Campo CPF com máscara, botão "Consultar", exibição de nome e saldo em R$
+    - _Requisitos: 17.1, 17.2, 17.3_
+  - [ ] 16.2 Criar componente `components/reprografia/FormBaixa.vue`
+    - Campo número de cópias; cálculo em tempo real do total a descontar; botão "Registrar Baixa" desabilitado se saldo insuficiente
+    - _Requisitos: 17.4_
+  - [ ] 16.3 Criar componente `components/reprografia/TabelaUsos.vue`
+    - Colunas: Data/Hora, CPF (mascarado), Nome, Nº Cópias, Valor Total, Saldo Após; ordenado por `registrado_em` DESC
+    - _Requisitos: 17.7_
+  - [ ] 16.4 Criar `pages/reprografia/index.vue`
+    - Integrar `ConsultaCpf`, `FormBaixa` e `TabelaUsos`; atualizar saldo e histórico após baixa sem reload
+    - _Requisitos: 17.1, 17.5, 17.9_
+  - [ ] 16.5 Criar `pages/admin/reprografia.vue`
+    - Exibir valor atual por cópia e última atualização (data + nome do admin); formulário para alterar valor
+    - _Requisitos: 18.1, 18.2, 18.4_
+
+- [ ] 17. Checkpoint — SISGRU e reprografia
+  - Garantir que todos os testes passem. Verificar via: `docker compose exec nuxt npx vitest --run`
+
+
+- [ ] 18. Telas de administração — usuários e grupos
+  - [ ] 18.1 Criar `pages/admin/usuarios.vue`
+    - Tabela de usuários com colunas: nome, email, grupos, ativo; botão para criar novo usuário
+    - Formulário de criação com validação client-side (email, senha mínima)
+    - _Requisitos: 4.1, 4.2, 4.4_
+  - [ ] 18.2 Criar `pages/admin/grupos.vue`
+    - Tabela de grupos com suas permissões associadas
+    - _Requisitos: 4.3, 4.4_
+
+- [ ] 19. Testes de integração end-to-end
+  - [ ]* 19.1 Escrever teste de integração: fluxo login → rota protegida → logout
+    - Verificar cookie, acesso autorizado e invalidação de sessão
+    - _Requisitos: 1.1, 1.3, 1.4, 3.1_
+  - [ ]* 19.2 Escrever teste de integração: token adulterado → 401
+    - _Requisitos: 3.3_
+  - [ ]* 19.3 Escrever teste de integração: usuário sem permissão → 403
+    - _Requisitos: 3.4_
+  - [ ]* 19.4 Escrever teste de integração: sincronização SISGRU com mock do webservice
+    - Verificar inserção de GRUs, Pagamentos e acumulação de créditos reprografia
+    - _Requisitos: 7.5, 16.1_
+
+- [ ] 20. Checkpoint final — todos os testes passando
+  - Garantir que todos os testes passem. Verificar via: `docker compose exec nuxt npx vitest --run`
+  - Verificar ausência de arquivos sensíveis no git: `git status` não deve listar `.env`, `ssl/`, `*.key`, `*.pem`
+
+## Notas
+
+- Tarefas marcadas com `*` são opcionais e podem ser puladas para MVP mais rápido
+- Todos os comandos devem ser executados via `docker compose exec nuxt <cmd>` ou `docker compose run --rm nuxt <cmd>`
+- Cada tarefa referencia requisitos específicos para rastreabilidade
+- Propriedades de corretude (fast-check) validam invariantes universais do sistema
+- Testes unitários validam exemplos específicos e casos de borda
+- Checkpoints garantem validação incremental a cada fase

@@ -1,0 +1,1878 @@
+Endpoint: /pagamentos
+Filtros: ug=158461&dataAlteracaoSituacaoPagTesouro=25/03/2026-25/03/2026
+Status HTTP: 200
+<?xml version="1.0" encoding="UTF-8"?>
+<pagamentos>
+  <pagamento>
+    <id>77136575</id>
+    <codigo>5Knwny3jvSvtZJiEsYSmZV</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 10:37</data>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>01191409007</codigoContribuinte>
+    <nomeContribuinte>Luciane do Nascimento Teles Zacaria </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>RE</situacao>
+    <valorTotal>9</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:37</dataAlteracaoSituacaoPagTesouro>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77200409</id>
+    <codigo>4wuni1b6RmHwUYCsyogC9H</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 07:28</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E9040088820260325102758219766294</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>03540224904</codigoContribuinte>
+    <nomeContribuinte>Sandra Mara Vargas Simioni</nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>10</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 07:28</dataAlteracaoSituacaoPagTesouro>
+    <ispb>90400888</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77200441</id>
+    <codigo>5DEocbdjaGPPZLgm3dAvpY</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 07:30</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E22896431202603251029iXsGHB6FijM</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>11132995922</codigoContribuinte>
+    <nomeContribuinte>Yasmin Seghetto Gonçalves </nomeContribuinte>
+    <numeroReferencia>19</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>4</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 07:30</dataAlteracaoSituacaoPagTesouro>
+    <ispb>22896431</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77201542</id>
+    <codigo>fUF8sHrSAMpBAsc0vpXl9</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 08:05</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E8778026820260325110445hl19DfMLo</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>11205287981</codigoContribuinte>
+    <nomeContribuinte>Gabrieli Tochetto Lorenzetti </nomeContribuinte>
+    <numeroReferencia>32</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>16</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 08:05</dataAlteracaoSituacaoPagTesouro>
+    <ispb>87780268</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77202901</id>
+    <codigo>2JIdDgajjt030ZmGxqY7Wa</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 08:24</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E8778026820260325112443xORLwWdbL</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>10055615910</codigoContribuinte>
+    <nomeContribuinte>Henrique Bruno Crozetta </nomeContribuinte>
+    <numeroReferencia>10</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>30</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 08:24</dataAlteracaoSituacaoPagTesouro>
+    <ispb>87780268</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77203679</id>
+    <codigo>2xFYxfrWly7lRya3IFxBEX</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 08:34</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E18236120202603251134s10df40328c</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>16484265909</codigoContribuinte>
+    <nomeContribuinte>Tuany herder</nomeContribuinte>
+    <numeroReferencia>5</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>1.25</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 08:34</dataAlteracaoSituacaoPagTesouro>
+    <ispb>18236120</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77203688</id>
+    <codigo>ZtqDI4OSRoq3fAOU3TQAd</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 08:34</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E04565791202603251134b3BASL0Z9LR</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>04373805059</codigoContribuinte>
+    <nomeContribuinte>Rafaela Salla</nomeContribuinte>
+    <numeroReferencia>5</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>1.25</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 08:34</dataAlteracaoSituacaoPagTesouro>
+    <ispb>04565791</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77203701</id>
+    <codigo>2fSVVupbCd0I6qyiwvAbed</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 08:34</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E18236120202603251134s10d8567277</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>12273395930</codigoContribuinte>
+    <nomeContribuinte>Mauricio Dias Gomes da Silva </nomeContribuinte>
+    <numeroReferencia>5</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>1.52</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 08:34</dataAlteracaoSituacaoPagTesouro>
+    <ispb>18236120</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77203830</id>
+    <codigo>v2RAwsHe0vSzqjQJSE39G</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 08:36</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>31/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E18236120202603251136s14b3d9e245</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>04364810061</codigoContribuinte>
+    <nomeContribuinte>Vitor da Silva </nomeContribuinte>
+    <numeroReferencia>10</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>2.5</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 08:36</dataAlteracaoSituacaoPagTesouro>
+    <ispb>18236120</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77203849</id>
+    <codigo>1ycdytiplXLisqAqK21Owg</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 08:37</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>31/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E8778026820260325113715pvpwYMJpH</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>14061196952</codigoContribuinte>
+    <nomeContribuinte>Maiele Fernanda Marafon Petter</nomeContribuinte>
+    <numeroReferencia>10</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>2.5</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 08:37</dataAlteracaoSituacaoPagTesouro>
+    <ispb>87780268</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77205622</id>
+    <codigo>6BP6S4JDynLaqZ7pnbLh68</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 08:59</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E810140602026032511592InDpGoYDME</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>11196695962</codigoContribuinte>
+    <nomeContribuinte>Karine Boita Rodrigues </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>20</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 08:59</dataAlteracaoSituacaoPagTesouro>
+    <ispb>81014060</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77206197</id>
+    <codigo>5zu7TFHPllAefHqojtMwEy</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 09:03</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>26/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E02090126202603251202CjjcsV9cVl8</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>09260665957</codigoContribuinte>
+    <nomeContribuinte>Amanda Luzia Mozer </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>12</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 09:03</dataAlteracaoSituacaoPagTesouro>
+    <ispb>02090126</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77208398</id>
+    <codigo>1a38f9VFAF3UeTrWL0NyCw</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 09:24</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E18236120202603251224s05dabe3ae6</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>04385843252</codigoContribuinte>
+    <nomeContribuinte>Matheus dos Santos Formigosa</nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>12</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 09:24</dataAlteracaoSituacaoPagTesouro>
+    <ispb>18236120</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77209088</id>
+    <codigo>7kUi2tB1p9wOVFmvZAPzbP</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 09:29</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E0000000020260325122933056294926</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>92755496053</codigoContribuinte>
+    <nomeContribuinte>Daniele Martini</nomeContribuinte>
+    <numeroReferencia>10</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>100</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 09:29</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00000000</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77209433</id>
+    <codigo>6a8ghFbX46f2xlGHBFdI1h</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 09:33</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E05425526202603251232DpLg4w9jjW5</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>42569877972</codigoContribuinte>
+    <nomeContribuinte>RENATO IVO MULLER</nomeContribuinte>
+    <numeroReferencia>15</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>150</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 09:33</dataAlteracaoSituacaoPagTesouro>
+    <ispb>05425526</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77209676</id>
+    <codigo>6E2kXTLxMQ2f6HuxNs61LD</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 09:34</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>26/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E0000000020260325123430471460757</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>08685183952</codigoContribuinte>
+    <nomeContribuinte>Gabriela Barão Hoch </nomeContribuinte>
+    <numeroReferencia>2</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>6</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 09:34</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00000000</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77209778</id>
+    <codigo>2AQ0weJQXAo2HhDrywPN5A</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 09:35</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E0000000020260325123540369319719</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>11578337992</codigoContribuinte>
+    <nomeContribuinte>Maria Eduarda Gubert</nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>3</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 09:35</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00000000</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77210167</id>
+    <codigo>6xCvtN4ZaoIXHHBD5daKm3</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14681</id>
+      <nome>MULTA DE BIBLIOTECA</nome>
+    </servico>
+    <data>25/03/2026 09:38</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>09/04/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E00204963202603251238QF16PLTPYDK</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>11549549944</codigoContribuinte>
+    <nomeContribuinte>VICTOR NAGI STUMPF</nomeContribuinte>
+    <numeroReferencia>38</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>9</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 09:38</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00204963</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77211727</id>
+    <codigo>2dxc3JltMRuwQbFNkYMh4Z</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 09:52</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E00416968202603251252sctkPENWj1I</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>13131667907</codigoContribuinte>
+    <nomeContribuinte>Stefani Becker Pinheiro</nomeContribuinte>
+    <numeroReferencia>21</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>5.25</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 09:52</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00416968</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77212514</id>
+    <codigo>2Ub6VS8OpQvpfgq75lsKox</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 09:58</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E00416968202603251258ibepMbAzhwF</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>11160197954</codigoContribuinte>
+    <nomeContribuinte>Angelina Bordin</nomeContribuinte>
+    <numeroReferencia>4</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>1</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 09:58</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00416968</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77212702</id>
+    <codigo>6gA4wlplcOjCARdNdoqEHm</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 10:00</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E0000000020260325130009992868881</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>11951308999</codigoContribuinte>
+    <nomeContribuinte>Ana Luiza </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>30</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:00</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00000000</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77213065</id>
+    <codigo>y8a1bXeaLy6ieUWVEXxzY</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 10:03</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>30/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E0000000020260325130322204848598</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>02996566084</codigoContribuinte>
+    <nomeContribuinte>Franciele da Silva Ribeiro </nomeContribuinte>
+    <numeroReferencia>3</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>30</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:03</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00000000</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77213392</id>
+    <codigo>6xtfNEgaBSdFZ2nCKPJ1qy</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 10:06</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E00416968202603251305zuOloy63ZGY</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>11160197954</codigoContribuinte>
+    <nomeContribuinte>Angelina Bordin </nomeContribuinte>
+    <numeroReferencia>17</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>16.25</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:06</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00416968</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77213814</id>
+    <codigo>1ATmc3NCB0Dpb0ZrBr5u6n</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 10:08</data>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>10323807992</codigoContribuinte>
+    <nomeContribuinte>Jose Augusto</nomeContribuinte>
+    <numeroReferencia>19</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>SU</situacao>
+    <valorTotal>4.75</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:08</dataAlteracaoSituacaoPagTesouro>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77214044</id>
+    <codigo>2EMsrYan9jl5GLR4AL2aAM</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 10:11</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E02910987202603251311bvp7l3GbTCi</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>11826466975</codigoContribuinte>
+    <nomeContribuinte>Raffaella Basso Budke </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>45</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:11</dataAlteracaoSituacaoPagTesouro>
+    <ispb>02910987</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77214411</id>
+    <codigo>6TMBQGf1GBWwzW8FVLDXkK</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 10:14</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E8778026820260325131349WQWdVUSNJ</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>03628227003</codigoContribuinte>
+    <nomeContribuinte>Ruan Ricardo </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>20</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:14</dataAlteracaoSituacaoPagTesouro>
+    <ispb>87780268</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77214810</id>
+    <codigo>GbQdMVTd3Z5iaNPuZQGaj</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 10:16</data>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>11216866996</codigoContribuinte>
+    <nomeContribuinte>Yasmin Schwarz Marafon </nomeContribuinte>
+    <numeroReferencia>16</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>SU</situacao>
+    <valorTotal>15</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:16</dataAlteracaoSituacaoPagTesouro>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77214967</id>
+    <codigo>6omwdy3g45BBmJ52DoBNJK</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>16279</id>
+      <nome>SERVIÇO DE CÓPIAS E IMPRESSÕES</nome>
+    </servico>
+    <data>25/03/2026 10:18</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E788400712026032513184Tjpw2wILBk</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28830</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVIÇOS ADMINISTRATIVOS</descricao>
+    </recolhimento>
+    <codigoContribuinte>11216866996</codigoContribuinte>
+    <nomeContribuinte>Yasmin Schwarz Marafon </nomeContribuinte>
+    <numeroReferencia>24</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>15</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:18</dataAlteracaoSituacaoPagTesouro>
+    <ispb>78840071</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77215811</id>
+    <codigo>69KK9hhPBeblYNeCqSvJZX</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 10:24</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E78865995202603251324W9XOVcV8eXj</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>11574543997</codigoContribuinte>
+    <nomeContribuinte>Julia Salvatti </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>18</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:24</dataAlteracaoSituacaoPagTesouro>
+    <ispb>78865995</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77218315</id>
+    <codigo>JFGkbTYbJgTMUqt1qDjdX</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 10:43</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E0000000020260325134304324187569</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>13497322903</codigoContribuinte>
+    <nomeContribuinte>Karoline Bernardi </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>3</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:43</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00000000</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77219535</id>
+    <codigo>5m4emdsVzcAIfwikjUIsQ7</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 10:52</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E18236120202603251352s0489fc67ee</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>09904848904</codigoContribuinte>
+    <nomeContribuinte>Kemily Monique Rahmeier Tobias </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>3</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:52</dataAlteracaoSituacaoPagTesouro>
+    <ispb>18236120</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77219599</id>
+    <codigo>44aLval8B0bDgHwbUqJnVu</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 10:53</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E18236120202603251353s108ef38dde</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>13655448937</codigoContribuinte>
+    <nomeContribuinte>Laura Casagrande Kimura </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>3</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:53</dataAlteracaoSituacaoPagTesouro>
+    <ispb>18236120</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77220221</id>
+    <codigo>5fT9GePEC3xX10thkvDgP6</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 10:57</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E8778026820260325135733ckKFAlgtj</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>09430358995</codigoContribuinte>
+    <nomeContribuinte>Ana Julia Meneguzzi </nomeContribuinte>
+    <numeroReferencia>14671</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>30</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 10:57</dataAlteracaoSituacaoPagTesouro>
+    <ispb>87780268</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77220687</id>
+    <codigo>D7rASlUn0mHWXnxcoMXYZ</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 11:00</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E8773377020260325140043nGtlGCbC1</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>10679222960</codigoContribuinte>
+    <nomeContribuinte>Tainara Feldmann</nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>30</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 11:00</dataAlteracaoSituacaoPagTesouro>
+    <ispb>87733770</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77222587</id>
+    <codigo>oiLVIouoAZPzoYYM4JhCa</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 11:12</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E60701190202603251412DY5ST6RUU58</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>54891399864</codigoContribuinte>
+    <nomeContribuinte>Dande Mendes</nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>30</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 11:12</dataAlteracaoSituacaoPagTesouro>
+    <ispb>60701190</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77222694</id>
+    <codigo>7I4noI9H7eo9Yri0VlXtiV</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 11:12</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E18236120202603251412s058b8de8c1</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>08033813954</codigoContribuinte>
+    <nomeContribuinte>Gabriela Prigol Longo</nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>9</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 11:12</dataAlteracaoSituacaoPagTesouro>
+    <ispb>18236120</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77223206</id>
+    <codigo>3KBiGJhNi08rEEOJ5Gqlpa</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 11:16</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E0000000020260325141601495424643</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>71603395920</codigoContribuinte>
+    <nomeContribuinte>Fabiana Bortolini Foralosso </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>100</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 11:16</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00000000</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77224318</id>
+    <codigo>6l64p4YVsSGGkYJntEeBoS</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 11:23</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E8778026820260325142324bSLlGUT88</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>09278174971</codigoContribuinte>
+    <nomeContribuinte>Carol Schenkel </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>9</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 11:23</dataAlteracaoSituacaoPagTesouro>
+    <ispb>87780268</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77225828</id>
+    <codigo>4FhmxiiDJDor9pxQCPg0iW</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 11:33</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E0000000020260325143320387300834</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>85391972949</codigoContribuinte>
+    <nomeContribuinte>Marli Salette Gomes da Silva Xavier Vieira</nomeContribuinte>
+    <numeroReferencia>4</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>40</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 11:33</dataAlteracaoSituacaoPagTesouro>
+    <ispb>00000000</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77227081</id>
+    <codigo>21pc59qK3trq97P96JYCIq</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 11:41</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E18236120202603251441s0738518d4f</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>11534472908</codigoContribuinte>
+    <nomeContribuinte>Angélica Laís Vortmann</nomeContribuinte>
+    <numeroReferencia>10</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>30</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 11:41</dataAlteracaoSituacaoPagTesouro>
+    <ispb>18236120</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77228079</id>
+    <codigo>50sNsagcXSv3qfMtPOLpyU</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 11:48</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <numeroTransacaoPSP>E81016131202603251448cljjKg1CaX1</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>08483585979</codigoContribuinte>
+    <nomeContribuinte>Tainara Lizandra Schizzi Boesing </nomeContribuinte>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>30</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 11:48</dataAlteracaoSituacaoPagTesouro>
+    <ispb>81016131</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77230563</id>
+    <codigo>38jX3ycfLZ2Xz5IIhEZTBS</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 12:06</data>
+    <dataVencimento>26/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>02854072014</codigoContribuinte>
+    <nomeContribuinte>Bruno Rosa da Silva</nomeContribuinte>
+    <numeroReferencia>168630</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>SU</situacao>
+    <valorTotal>500</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 12:06</dataAlteracaoSituacaoPagTesouro>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77230657</id>
+    <codigo>2BQQQEargCOaBxQzB9GI3i</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 12:08</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>26/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E18236120202603251507s00a49161b5</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>02854072014</codigoContribuinte>
+    <nomeContribuinte>Bruno Rosa da Silva</nomeContribuinte>
+    <numeroReferencia>158630</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>500</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 12:08</dataAlteracaoSituacaoPagTesouro>
+    <ispb>18236120</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+  <pagamento>
+    <id>77231687</id>
+    <codigo>52aRPaLGV4E37A6Xx8BUtE</codigo>
+    <ug>
+      <codigo>158461</codigo>
+      <exercicio>2026</exercicio>
+      <nome>IF CATARINENSE - CAMPUS CONCÓRDIA</nome>
+    </ug>
+    <tipoServico>
+      <codigo>1201</codigo>
+      <nome>Administrativos e Comerciais Gerais</nome>
+      <descricao>Descrição...</descricao>
+    </tipoServico>
+    <servico>
+      <id>14671</id>
+      <nome>TICKET REFEIÇÃO</nome>
+    </servico>
+    <data>25/03/2026 12:15</data>
+    <dataPagamentoPSP>25/03/2026 00:00</dataPagamentoPSP>
+    <dataVencimento>25/03/2026</dataVencimento>
+    <competencia>032026</competencia>
+    <numeroTransacaoPSP>E18236120202603251515s18a9fc93c8</numeroTransacaoPSP>
+    <recolhimento>
+      <codigo>28837</codigo>
+      <exercicio>2026</exercicio>
+      <descricao>SERVICOS DE HOSPEDAGEM E ALIMENTACAO</descricao>
+    </recolhimento>
+    <codigoContribuinte>01185591095</codigoContribuinte>
+    <nomeContribuinte>TIAGO RAUGUST</nomeContribuinte>
+    <numeroReferencia>30</numeroReferencia>
+    <tipoPagamento>
+      <codigo>PX</codigo>
+      <nome>Pix</nome>
+    </tipoPagamento>
+    <provedorPagamento>
+      <id>2</id>
+      <nome>Tesouro Nacional</nome>
+    </provedorPagamento>
+    <situacao>CO</situacao>
+    <valorTotal>300</valorTotal>
+    <dataAlteracaoSituacaoPagTesouro>25/03/2026 12:15</dataAlteracaoSituacaoPagTesouro>
+    <ispb>18236120</ispb>
+    <formaUtilizacaoPagTesouro>2</formaUtilizacaoPagTesouro>
+  </pagamento>
+</pagamentos>

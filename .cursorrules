@@ -1,0 +1,18 @@
+# Steering: Ambiente Docker Dev
+
+Todo procedimento ou comando executado pelo editor/LLM/IA deve ser rodado no ambiente Docker dev.
+- Nunca executar comandos diretamente no host (npm, node, psql, etc.)
+- Usar `docker compose exec` ou `docker compose run` para rodar comandos dentro dos containers
+- Migrações de banco de dados devem ser executadas via container do Nuxt/app
+- Instalação de dependências deve ocorrer dentro do container ou via rebuild da imagem
+
+# Steering: Segurança
+
+Todo código gerado deve considerar segurança seguindo as diretrizes OWASP:
+- Proteção contra SQL Injection via queries parametrizadas exclusivamente
+- Proteção contra XSS, CSRF e outras vulnerabilidades do OWASP Top 10
+- Senhas sempre armazenadas com bcrypt (custo mínimo 12)
+- Cookies de sessão com flags HttpOnly, Secure e SameSite=Strict
+- Validação de entrada com Zod em todas as API routes
+- Nunca expor stack traces ou detalhes internos ao cliente
+- Rate limiting em endpoints de autenticação

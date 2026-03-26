@@ -1,0 +1,78 @@
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl/dev:/etc/nginx/ssl:ro
+    depends_on:
+      - nuxt
+    networks:
+      - tesouraria_net
+    restart: unless-stopped
+
+  nuxt:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    expose:
+      - "3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./app:/app
+      - /app/node_modules
+      - .secrets/sisgru.key:/run/secrets/sisgru.key:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - tesouraria_net
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    expose:
+      - "5432"
+    env_file:
+      - .env
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-tesouraria}
+      - POSTGRES_USER=${POSTGRES_USER:-tesouraria}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - tesouraria_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-tesouraria}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    ports:
+      - "5050:80"
+    env_file:
+      - .env
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    depends_on:
+      - postgres
+    networks:
+      - tesouraria_net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  tesouraria_net:
+    driver: bridge

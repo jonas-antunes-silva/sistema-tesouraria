@@ -1,0 +1,33 @@
+{
+  "name": "sistema-tesouraria",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "nuxt": "^3.13.0",
+    "@nuxtjs/tailwindcss": "^6.12.0",
+    "daisyui": "^4.12.0",
+    "pg": "^8.13.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "zod": "^3.23.8",
+    "node-cron": "^3.0.3",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "@types/pg": "latest",
+    "@types/bcryptjs": "latest",
+    "@types/jsonwebtoken": "latest",
+    "@types/node-cron": "latest",
+    "@types/xml2js": "latest",
+    "typescript": "latest",
+    "vitest": "^2.0.0",
+    "@vitejs/plugin-vue": "latest",
+    "fast-check": "^3.22.0",
+    "tsx": "latest"
+  }
+}
