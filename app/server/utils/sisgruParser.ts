@@ -97,9 +97,12 @@ function toOptStr(val: unknown): string | undefined {
 function toPgDate(val: unknown): string | undefined {
   if (val === undefined || val === null || String(val).trim() === '') return undefined
   const str = String(val).trim()
-  const datePart = str.split(' ')[0]
+  const [datePart, timePart] = str.split(' ')
   const [dd, mm, yyyy] = datePart.split('/')
   if (!dd || !mm || !yyyy) return undefined
+  if (timePart) {
+    return `${yyyy}-${mm}-${dd} ${timePart}`
+  }
   return `${yyyy}-${mm}-${dd}`
 }
 

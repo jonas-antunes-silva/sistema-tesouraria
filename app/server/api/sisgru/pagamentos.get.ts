@@ -28,7 +28,7 @@ export default defineEventHandler(async (event) => {
       `SELECT sp.*, u.nome AS ticket_retirado_por_nome
        FROM sisgru_pagamentos sp
        LEFT JOIN usuarios u ON u.id = sp.ticket_retirado_por
-       WHERE DATE(sp.data_alteracao_situacao_pag_tesouro AT TIME ZONE 'America/Sao_Paulo') = $1::date
+       WHERE DATE(sp.data_alteracao_situacao_pag_tesouro) = $1::date
         ORDER BY sp.data DESC NULLS LAST, sp.id DESC`,
       [dataPostgres],
     )

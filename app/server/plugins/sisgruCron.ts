@@ -20,16 +20,10 @@ export default defineNitroPlugin(() => {
   )
 
   cron.schedule(expressaoCron, async () => {
-    const agora = new Date()
-    const dd = String(agora.getDate()).padStart(2, '0')
-    const mm = String(agora.getMonth() + 1).padStart(2, '0')
-    const yyyy = agora.getFullYear()
-    const dataHoje = `${dd}/${mm}/${yyyy}`
-
-    console.log(`[sisgruCron] Iniciando sincronização do dia ${dataHoje}`)
+    console.log('[sisgruCron] Iniciando sincronização dos últimos 5 dias')
     try {
-      await syncDia(dataHoje)
-      console.log(`[sisgruCron] Sincronização do dia ${dataHoje} concluída.`)
+      await syncDia()
+      console.log('[sisgruCron] Sincronização concluída.')
     } catch (err) {
       console.error(`[sisgruCron] Erro inesperado na sincronização: ${(err as Error).message}`)
     }

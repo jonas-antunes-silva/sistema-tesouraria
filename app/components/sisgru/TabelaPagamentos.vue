@@ -3,7 +3,8 @@
     <table class="table table-zebra table-hover w-full">
       <thead>
         <tr>
-          <th class="w-24">ID</th>
+          <!-- <th class="w-24">ID</th>
+          <th class="w-32">Código</th> -->
           <th class="w-48">Contribuinte</th>
           <th class="w-32">CPF</th>
           <th class="w-64">
@@ -32,8 +33,12 @@
           <th class="w-32">Valor Total (R$)</th>
           <th class="w-28">Situação</th>
           <th class="w-40">Tipo Pagamento</th>
-          <th class="w-24">Data</th>
-          <th class="w-36">Ticket</th>
+          <th class="w-24">Data SISGRU</th>
+          <!-- <th class="w-24">Data PagTesouro</th> -->
+          <th class="w-36">Data PSP</th>
+          <!-- <th class="w-36">Criação</th>
+          <th class="w-36">Sync</th> -->
+          <th class="w-28">Ticket</th>
         </tr>
       </thead>
       <tbody>
@@ -44,38 +49,37 @@
         </tr>
         <TransitionGroup name="list">
           <tr v-for="p in pagamentosFiltrados" :key="p.id">
-            <td>{{ p.id }}</td>
+            <!-- <td>{{ p.id }}</td>
+            <td class="font-mono text-xs">{{ p.codigo }}</td> -->
             <td>{{ p.nome_contribuinte }}</td>
-            <td class="font-mono text-xs">{{ mascaraCpf(p.codigo_contribuinte) }}</td>
+            <td class="font-mono text-xs">{{ formatarCpf(p.codigo_contribuinte) }}</td>
             <td>{{ p.servico_nome }}</td>
-            <td class="text-right">{{ formatarMoeda(p.valor_total) }}</td>
+            <td>{{ formatarMoeda(p.valor_total) }}</td>
             <td>
               <span
                 class="badge"
                 :class="{
-                  'badge-success': p.situacao === 'CO',
-                  'badge-warning': p.situacao === 'RE',
-                  'badge-neutral': p.situacao !== 'CO' && p.situacao !== 'RE'
+                  'badge-success text-white': p.situacao === 'CO',
+                  'badge-warning text-neutral': p.situacao === 'CA',
+                  'badge-error text-white': p.situacao === 'RE',
+                  'badge-neutral': p.situacao !== 'CO' && p.situacao !== 'CA' && p.situacao !== 'RE'
                 }"
               >{{ traducaoSituacao(p.situacao) }}</span>
             </td>
             <td>{{ p.tipo_pagamento_nome }}</td>
             <td>{{ formatarData(p.data) }}</td>
+            <!-- <td>{{ formatarData(p.data_alteracao_situacao_pag_tesouro) }}</td> -->
+            <td>{{ formatarDataHora(p.data_pagamento_psp) }}</td>
+            <!-- <td>{{ formatarDataHora(p.dt_criacao) }}</td>
+            <td>{{ formatarDataHora(p.sincronizado_em) }}</td> -->
             <td>
-              <template v-if="String(p.servico_id) === '14671'">
-                <span v-if="p.ticket_retirado" class="text-success flex items-center gap-1">
+              <template v-if="String(p.servico_id) === '14671' && p.situacao === 'CO'">
+                <span v-if="p.ticket_retirado" class="badge badge-success font-bold text-white flex items-center gap-1">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
                   Retirado
                 </span>
-                <button
-                  v-else
-                  class="btn btn-xs btn-neutral"
-                  @click="abrirModal(p)"
-                >
-                  Registrar Entrega
-                </button>
               </template>
             </td>
           </tr>
@@ -87,35 +91,17 @@
             Total: {{ pagamentosFiltrados.length }} registro{{ pagamentosFiltrados.length !== 1 ? 's' : '' }}
           </td>
           <td class="text-right font-semibold text-neutral text-base">{{ formatarMoeda(somaTotal) }}</td>
-          <td colspan="4"></td>
+          <td colspan="5"></td>
         </tr>
       </tfoot>
     </table>
-
-    <dialog ref="modalRef" class="modal">
-      <div class="modal-box">
-        <h3 class="font-bold text-lg">Confirmar Entrega</h3>
-        <p class="py-4">
-          Confirmar a entrega do ticket refeição para<br>
-          <strong>{{ pagamentoSelecionado?.nome_contribuinte }}</strong>?
-        </p>
-        <div class="modal-action">
-          <form method="dialog">
-            <button class="btn btn-ghost mr-2">Cancelar</button>
-            <button class="btn btn-primary" @click.prevent="confirmarEntrega">Confirmar</button>
-          </form>
-        </div>
-      </div>
-      <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-      </form>
-    </dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 export interface PagamentoRow {
   id: number
+  codigo: string
   nome_contribuinte: string
   codigo_contribuinte: string
   servico_nome: string
@@ -124,6 +110,10 @@ export interface PagamentoRow {
   situacao: string
   tipo_pagamento_nome: string
   data: string
+  data_alteracao_situacao_pag_tesouro: string
+  data_pagamento_psp: string | null
+  dt_criacao: string
+  sincronizado_em: string
   ticket_retirado: boolean
   ticket_retirado_em?: string
   ticket_retirado_por_nome?: string
@@ -141,9 +131,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   'marcar-ticket': [id: number]
 }>()
-
-const modalRef = ref<HTMLDialogElement | null>(null)
-const pagamentoSelecionado = ref<PagamentoRow | null>(null)
 
 const servicosUnicos = computed<ServicoOpcao[]>(() => {
   const seen = new Set<string>()
@@ -183,15 +170,51 @@ function formatarMoeda(valor: number): string {
 
 function formatarData(data: string): string {
   if (!data) return '—'
-  const d = new Date(data)
-  if (isNaN(d.getTime())) return data
-  return d.toLocaleDateString('pt-BR')
+  const match = data.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (match) {
+    const [, year, month, day] = match
+    return `${day}/${month}/${year}`
+  }
+  return data
+}
+
+function formatarDataHora(data: string | null | undefined): string {
+  if (!data) return '—'
+  const match = data.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/)
+  if (match) {
+    const [, year, month, day, hour, minute] = match
+    let h = parseInt(hour, 10) - 3
+    let d = parseInt(day, 10)
+    let m = parseInt(month, 10)
+    let y = parseInt(year, 10)
+    if (h < 0) {
+      h += 24
+      d -= 1
+      if (d < 1) {
+        m -= 1
+        if (m < 1) {
+          m = 12
+          y -= 1
+        }
+        const diasNoMes = new Date(y, m, 0).getDate()
+        d = diasNoMes
+      }
+    }
+    return `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y} ${String(h).padStart(2, '0')}:${minute}`
+  }
+  return data
 }
 
 function mascaraCpf(cpf: string): string {
   const digits = cpf.replace(/\D/g, '')
   if (digits.length !== 11) return cpf
   return `***.${digits.slice(3, 6)}.${digits.slice(6, 9)}-**`
+}
+
+function formatarCpf(cpf: string): string {
+  const digits = cpf.replace(/\D/g, '')
+  if (digits.length !== 11) return cpf
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`
 }
 
 function traducaoSituacao(codigo: string): string {
@@ -205,18 +228,6 @@ function traducaoSituacao(codigo: string): string {
     RE: 'Rejeitado',
   }
   return traducoes[codigo] ?? codigo
-}
-
-function abrirModal(pagamento: PagamentoRow) {
-  pagamentoSelecionado.value = pagamento
-  modalRef.value?.showModal()
-}
-
-function confirmarEntrega() {
-  if (pagamentoSelecionado.value) {
-    emit('marcar-ticket', pagamentoSelecionado.value.id)
-  }
-  modalRef.value?.close()
 }
 </script>
 
