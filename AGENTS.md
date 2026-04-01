@@ -4,6 +4,13 @@
 
 Nuxt 3 (Vue 3 + TypeScript) + PostgreSQL application for treasury operations: GRUs, payments, and reprography credits.
 
+## Diretrizes do Projeto (Obrigatórias)
+
+- O ambiente de desenvolvimento roda localmente com Docker Compose.
+- Todos os comandos e ações devem ser executados dentro do container da aplicação (`docker compose exec nuxt <command>`).
+- Estilos de frontend devem usar Tailwind CSS com DaisyUI e tema `emerald`.
+- O sistema deve seguir recomendações OWASP de segurança.
+
 ## Docker Environment (REQUIRED)
 
 All commands MUST run inside Docker:

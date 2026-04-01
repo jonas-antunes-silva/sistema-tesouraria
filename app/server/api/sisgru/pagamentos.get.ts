@@ -25,9 +25,21 @@ export default defineEventHandler(async (event) => {
 
   try {
     const result = await query(
-      `SELECT sp.*, u.nome AS ticket_retirado_por_nome
+      `SELECT sp.id,
+              sp.codigo,
+              sp.codigo_contribuinte,
+              sp.nome_contribuinte,
+              sp.servico_id,
+              sp.servico_nome,
+              sp.valor_total,
+              sp.situacao,
+              sp.tipo_pagamento_nome,
+              sp.data,
+              sp.data_alteracao_situacao_pag_tesouro,
+              sp.data_pagamento_psp,
+              sp.dt_criacao,
+              sp.sincronizado_em
        FROM sisgru_pagamentos sp
-       LEFT JOIN usuarios u ON u.id = sp.ticket_retirado_por
        WHERE DATE(sp.data_alteracao_situacao_pag_tesouro) = $1::date
         ORDER BY sp.data DESC NULLS LAST, sp.id DESC`,
       [dataPostgres],

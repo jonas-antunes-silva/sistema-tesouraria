@@ -38,12 +38,11 @@
           <th class="w-36">Data PSP</th>
           <!-- <th class="w-36">Criação</th>
           <th class="w-36">Sync</th> -->
-          <th class="w-28">Ticket</th>
         </tr>
       </thead>
       <tbody>
         <tr v-if="pagamentosFiltrados.length === 0">
-          <td colspan="9" class="text-center text-base-content/60 py-8">
+          <td colspan="8" class="text-center text-base-content/60 py-8">
             Nenhum registro encontrado
           </td>
         </tr>
@@ -72,16 +71,6 @@
             <td>{{ formatarDataHora(p.data_pagamento_psp) }}</td>
             <!-- <td>{{ formatarDataHora(p.dt_criacao) }}</td>
             <td>{{ formatarDataHora(p.sincronizado_em) }}</td> -->
-            <td>
-              <template v-if="String(p.servico_id) === '14671' && p.situacao === 'CO'">
-                <span v-if="p.ticket_retirado" class="badge badge-success font-bold text-white flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                  </svg>
-                  Retirado
-                </span>
-              </template>
-            </td>
           </tr>
         </TransitionGroup>
       </tbody>
@@ -91,7 +80,7 @@
             Total: {{ pagamentosFiltrados.length }} registro{{ pagamentosFiltrados.length !== 1 ? 's' : '' }}
           </td>
           <td class="text-right font-semibold text-neutral text-base">{{ formatarMoeda(somaTotal) }}</td>
-          <td colspan="5"></td>
+          <td colspan="4"></td>
         </tr>
       </tfoot>
     </table>
@@ -114,9 +103,6 @@ export interface PagamentoRow {
   data_pagamento_psp: string | null
   dt_criacao: string
   sincronizado_em: string
-  ticket_retirado: boolean
-  ticket_retirado_em?: string
-  ticket_retirado_por_nome?: string
 }
 
 interface ServicoOpcao {
@@ -126,10 +112,6 @@ interface ServicoOpcao {
 
 const props = defineProps<{
   pagamentos: PagamentoRow[]
-}>()
-
-const emit = defineEmits<{
-  'marcar-ticket': [id: number]
 }>()
 
 const servicosUnicos = computed<ServicoOpcao[]>(() => {

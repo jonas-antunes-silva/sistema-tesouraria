@@ -18,18 +18,59 @@ export default defineEventHandler(async (event) => {
   }
 
   try {
-    const result = await query(
-      `SELECT sp.id, sp.codigo_contribuinte, sp.nome_contribuinte, 
-              sp.valor_total, sp.situacao, sp.data, sp.ticket_retirado,
-              sp.ticket_retirado_em, sp.ticket_retirado_por
+    const pagamentos = await query<{
+      id: number
+      codigo_contribuinte: string
+      nome_contribuinte: string
+      valor_total: string
+      situacao: string
+      data: string
+    }>(
+      `SELECT sp.id, sp.codigo_contribuinte, sp.nome_contribuinte,
+              sp.valor_total, sp.situacao, sp.data
        FROM sisgru_pagamentos sp
-       WHERE sp.codigo_contribuinte = $1 
+       WHERE sp.codigo_contribuinte = $1
          AND sp.servico_id = 14671
-         AND sp.ticket_retirado = false
+         AND sp.situacao = 'CO'
        ORDER BY sp.data DESC`,
       [parsed.data.cpf],
     )
-    return result.rows
+
+    const totalCreditosResult = await query<{ total: string }>(
+      `SELECT COALESCE(SUM(sp.valor_total), 0)::text AS total
+       FROM sisgru_pagamentos sp
+       WHERE sp.codigo_contribuinte = $1
+         AND sp.servico_id = 14671
+         AND sp.situacao = 'CO'`,
+      [parsed.data.cpf],
+    )
+
+    const totalConsumidoResult = await query<{ total: string }>(
+      `SELECT COALESCE(SUM(te.valor_consumido), 0)::text AS total
+       FROM ticket_entregas te
+       WHERE te.cpf = $1`,
+      [parsed.data.cpf],
+    )
+
+    const totalCreditos = Number(totalCreditosResult.rows[0]?.total ?? 0)
+    const totalConsumido = Number(totalConsumidoResult.rows[0]?.total ?? 0)
+    const saldoDisponivel = Math.max(0, totalCreditos - totalConsumido)
+
+    return {
+      cpf: parsed.data.cpf,
+      nome: pagamentos.rows[0]?.nome_contribuinte ?? null,
+      total_creditos: totalCreditos,
+      total_consumido: totalConsumido,
+      saldo_disponivel: saldoDisponivel,
+      pagamentos: pagamentos.rows.map((p) => ({
+        id: p.id,
+        codigo_contribuinte: p.codigo_contribuinte,
+        nome_contribuinte: p.nome_contribuinte,
+        valor_total: Number(p.valor_total),
+        situacao: p.situacao,
+        data: p.data,
+      })),
+    }
   } catch {
     throw createError({ statusCode: 500, statusMessage: 'Erro interno' })
   }

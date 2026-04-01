@@ -11,13 +11,11 @@ services:
     build:
       context: ./app
       dockerfile: Dockerfile
-    command: node .output/server/index.mjs
+      target: prod
     env_file:
       - .env.prod
     environment:
       - NODE_ENV=production
-    volumes:
-      - /app/node_modules
     # Sem bind mount do código fonte (sem hot-reload)
 
   postgres:

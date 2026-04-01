@@ -112,3 +112,61 @@ Para habilitar:
 docker compose down
 ```
 
+## 10. Deploy de producao (imagem pronta)
+
+O projeto agora usa build multi-stage no Dockerfile para producao.
+Isso significa que o `npm run build` acontece no `docker build` e o container sobe
+direto com `node .output/server/index.mjs`.
+
+### 10.1 Preparar ambiente de producao
+
+1. Crie `.env.prod` a partir de `.env.example` e preencha os valores de producao.
+2. Garanta os certificados TLS em:
+   - `ssl/prod/cert.pem`
+   - `ssl/prod/key.pem`
+
+### 10.2 Subir stack de producao
+
+Use compose base + override de producao:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d --build
+```
+
+### 10.3 Rodar migrations em producao
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod exec nuxt npx tsx server/db/migrate.ts
+```
+
+### 10.4 Seed inicial (somente primeiro deploy)
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod exec nuxt node -e "
+  const fs = require('fs');
+  const { Pool } = require('pg');
+  const sql = fs.readFileSync('server/db/seed.sql', 'utf8');
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  pool.query(sql)
+    .then(() => { console.log('seed ok'); return pool.end(); })
+    .catch((e) => { console.error(e); process.exit(1); });
+"
+```
+
+### 10.5 Verificacao rapida
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod ps
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod logs -f nginx nuxt postgres
+```
+
+### 10.6 Atualizacao de versao
+
+1. Atualize o codigo no servidor.
+2. Execute novamente:
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d --build
+docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod exec nuxt npx tsx server/db/migrate.ts
+```
+

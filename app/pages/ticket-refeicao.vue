@@ -43,17 +43,38 @@
     </Transition>
 
     <Transition name="slide-fade">
-      <div v-if="pagamentos.length > 0" class="card bg-base-100 shadow-xl mb-6">
+      <div v-if="resumo && resumo.pagamentos.length > 0" class="card bg-base-100 shadow-xl mb-6">
         <div class="card-body">
           <div class="flex justify-between items-center mb-4">
             <div>
-              <h2 class="text-lg font-semibold">{{ pagamentos[0].nome_contribuinte }}</h2>
-              <p class="text-sm text-base-content/60">{{ formatarCpf(pagamentos[0].codigo_contribuinte) }}</p>
+              <h2 class="text-lg font-semibold">{{ resumo.nome }}</h2>
+              <p class="text-sm text-base-content/60">{{ formatarCpf(resumo.cpf) }}</p>
             </div>
             <div class="text-right">
-              <p class="text-sm text-base-content/60">Total a receber</p>
-              <p class="text-2xl font-bold text-primary">{{ formatarMoeda(total) }}</p>
-              <p class="text-sm text-base-content/60">{{ pagamentos.length }} ticket(s)</p>
+              <p class="text-sm text-base-content/60">Saldo disponível</p>
+              <p class="text-2xl font-bold text-primary">{{ formatarMoeda(resumo.saldo_disponivel) }}</p>
+              <p class="text-sm text-base-content/60">{{ resumo.pagamentos.length }} pagamento(s) concluído(s)</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4">
+            <div class="stats bg-base-200">
+              <div class="stat py-3 px-4">
+                <div class="stat-title text-xs">Créditos acumulados</div>
+                <div class="stat-value text-lg">{{ formatarMoeda(resumo.total_creditos) }}</div>
+              </div>
+            </div>
+            <div class="stats bg-base-200">
+              <div class="stat py-3 px-4">
+                <div class="stat-title text-xs">Já consumido</div>
+                <div class="stat-value text-lg">{{ formatarMoeda(resumo.total_consumido) }}</div>
+              </div>
+            </div>
+            <div class="stats bg-base-200">
+              <div class="stat py-3 px-4">
+                <div class="stat-title text-xs">Máx. tickets (tipo atual)</div>
+                <div class="stat-value text-lg">{{ maxTickets }} </div>
+              </div>
             </div>
           </div>
 
@@ -67,7 +88,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="p in pagamentos" :key="p.id">
+                <tr v-for="p in resumo.pagamentos" :key="p.id">
                   <td>{{ formatarData(p.data) }}</td>
                   <td>{{ formatarMoeda(p.valor_total) }}</td>
                   <td>
@@ -81,17 +102,17 @@
           </div>
 
           <div class="card-actions justify-end mt-4">
-            <button class="btn btn-primary" @click="abrirModal">
+            <button class="btn btn-primary" @click="abrirModal" :disabled="!temTipoDisponivel">
               Registrar Entrega
             </button>
           </div>
         </div>
       </div>
-      <div v-else-if="buscou && pagamentos.length === 0" class="alert mb-6">
+      <div v-else-if="buscou && (!resumo || resumo.pagamentos.length === 0)" class="alert mb-6">
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <span>Nenhum ticket pendente de entrega para este CPF.</span>
+        <span>Nenhum crédito disponível para este CPF.</span>
       </div>
     </Transition>
 
@@ -117,6 +138,8 @@
                 <th>Beneficiário</th>
                 <th>Tipo</th>
                 <th>Qtd</th>
+                <th>Consumo</th>
+                <th>Saldo após</th>
               </tr>
             </thead>
             <tbody>
@@ -127,6 +150,8 @@
                 <td>{{ t.nome_contribuinte || '—' }}</td>
                 <td class="capitalize">{{ t.tipo }}</td>
                 <td>{{ t.quantidade }}</td>
+                <td>{{ formatarMoeda(t.valor_consumido || 0) }}</td>
+                <td>{{ formatarMoeda(t.saldo_depois || 0) }}</td>
               </tr>
             </tbody>
           </table>
@@ -140,8 +165,8 @@
         
         <div class="py-4">
           <div class="mb-4">
-            <p class="font-medium">{{ pagamentos[0]?.nome_contribuinte }}</p>
-            <p class="text-sm text-base-content/60">{{ formatarCpf(pagamentos[0]?.codigo_contribuinte || '') }}</p>
+            <p class="font-medium">{{ resumo?.nome }}</p>
+            <p class="text-sm text-base-content/60">{{ formatarCpf(resumo?.cpf || '') }}</p>
           </div>
 
           <div class="form-control mb-4">
@@ -166,17 +191,36 @@
 
           <div class="bg-base-200 p-4 rounded-lg">
             <div class="flex justify-between items-center">
-              <span>Valor Total Créditos:</span>
-              <span class="font-bold">{{ formatarMoeda(total) }}</span>
+              <span>Saldo disponível:</span>
+              <span class="font-bold">{{ formatarMoeda(resumo?.saldo_disponivel || 0) }}</span>
             </div>
             <div class="flex justify-between items-center">
               <span>Valor Unitário:</span>
               <span>R$ {{ precos[tipoPessoa]?.toFixed(2) }}</span>
             </div>
+            <div class="form-control my-3">
+              <label class="label p-0 pb-2">
+                <span class="label-text font-medium">Quantidade para baixa</span>
+              </label>
+              <input
+                v-model.number="quantidadeEntrega"
+                type="number"
+                min="1"
+                :max="maxTickets"
+                class="input input-bordered"
+              />
+              <label class="label p-0 pt-2">
+                <span class="label-text-alt">Máximo para o saldo atual: {{ maxTickets }}</span>
+              </label>
+            </div>
             <div class="divider my-2"></div>
             <div class="flex justify-between items-center">
-              <span class="font-bold">Total de Tickets:</span>
-              <span class="font-bold text-primary text-lg">{{ totalTickets }} ticket(s)</span>
+              <span class="font-bold">Consumo desta baixa:</span>
+              <span class="font-bold text-primary text-lg">{{ formatarMoeda(valorConsumoEntrega) }}</span>
+            </div>
+            <div class="flex justify-between items-center mt-1">
+              <span class="font-bold">Saldo após baixa:</span>
+              <span class="font-bold text-lg">{{ formatarMoeda(saldoAposEntrega) }}</span>
             </div>
           </div>
         </div>
@@ -184,7 +228,7 @@
         <div class="modal-action">
           <form method="dialog">
             <button class="btn btn-ghost mr-2">Cancelar</button>
-            <button class="btn btn-primary" @click.prevent="confirmarEntrega" :disabled="salvando">
+            <button class="btn btn-primary" @click.prevent="confirmarEntrega" :disabled="salvando || quantidadeEntrega <= 0 || quantidadeEntrega > maxTickets">
               <span v-if="salvando" class="loading loading-spinner loading-sm"></span>
               Confirmar
             </button>
@@ -208,7 +252,15 @@ interface Pagamento {
   valor_total: number
   situacao: string
   data: string
-  ticket_retirado: boolean
+}
+
+interface TicketResumo {
+  cpf: string
+  nome: string | null
+  total_creditos: number
+  total_consumido: number
+  saldo_disponivel: number
+  pagamentos: Pagamento[]
 }
 
 interface Transacao {
@@ -216,13 +268,15 @@ interface Transacao {
   tipo: string
   quantidade: number
   criado_em: string
+  valor_consumido?: number
+  saldo_depois?: number
   responsavel_nome: string
   codigo_contribuinte: string | null
   nome_contribuinte: string | null
 }
 
 const cpfDigits = ref('')
-const pagamentos = ref<Pagamento[]>([])
+const resumo = ref<TicketResumo | null>(null)
 const transacoes = ref<Transacao[]>([])
 const buscou = ref(false)
 const carregando = ref(false)
@@ -230,6 +284,7 @@ const carregandoTransacoes = ref(false)
 const salvando = ref(false)
 const modalRef = ref<HTMLDialogElement | null>(null)
 const tipoPessoa = ref<'estudante' | 'servidor' | 'visitante'>('servidor')
+const quantidadeEntrega = ref(1)
 const erroValidacao = ref<string | null>(null)
 const sucessoEntrega = ref<string | null>(null)
 
@@ -239,11 +294,34 @@ const precos = ref({
   visitante: 15,
 })
 
-const total = computed(() => pagamentos.value
-  .filter(p => p.situacao === 'CO')
-  .reduce((sum, p) => sum + Number(p.valor_total), 0)
-)
-const totalTickets = computed(() => Math.floor(total.value / precos.value[tipoPessoa.value]))
+const TIPOS_TICKET: Array<'estudante' | 'servidor' | 'visitante'> = ['estudante', 'servidor', 'visitante']
+
+const maxTicketsPorTipo = computed<Record<'estudante' | 'servidor' | 'visitante', number>>(() => {
+  const saldo = Number(resumo.value?.saldo_disponivel ?? 0)
+  return {
+    estudante: Math.floor(saldo / Number(precos.value.estudante || 0)) || 0,
+    servidor: Math.floor(saldo / Number(precos.value.servidor || 0)) || 0,
+    visitante: Math.floor(saldo / Number(precos.value.visitante || 0)) || 0,
+  }
+})
+
+const temTipoDisponivel = computed(() => TIPOS_TICKET.some((tipo) => maxTicketsPorTipo.value[tipo] > 0))
+
+const maxTickets = computed(() => {
+  return maxTicketsPorTipo.value[tipoPessoa.value]
+})
+
+const valorConsumoEntrega = computed(() => {
+  const qtd = Number(quantidadeEntrega.value || 0)
+  const preco = Number(precos.value[tipoPessoa.value] ?? 0)
+  if (qtd <= 0 || preco <= 0) return 0
+  return Number((qtd * preco).toFixed(2))
+})
+
+const saldoAposEntrega = computed(() => {
+  const saldo = Number(resumo.value?.saldo_disponivel ?? 0)
+  return Number(Math.max(0, saldo - valorConsumoEntrega.value).toFixed(2))
+})
 
 function formatInputCpf(digits: string): string {
   const d = digits.replace(/\D/g, '').slice(0, 11)
@@ -263,7 +341,7 @@ function onCpfInput(ev: Event) {
   if (cpfDigits.value.length === 11) {
     buscar()
   } else if (cpfDigits.value.length === 0) {
-    pagamentos.value = []
+    resumo.value = null
     buscou.value = false
   }
 }
@@ -274,8 +352,19 @@ async function carregarPrecos() {
     for (const p of data) {
       precos.value[p.tipo as keyof typeof precos.value] = Number(p.valor)
     }
+    ajustarTipoPessoaPorSaldo()
   } catch (err) {
     console.error('Erro ao carregar preços:', err)
+  }
+}
+
+function ajustarTipoPessoaPorSaldo() {
+  if (!resumo.value) return
+  if (maxTicketsPorTipo.value[tipoPessoa.value] > 0) return
+
+  const primeiroTipoDisponivel = TIPOS_TICKET.find((tipo) => maxTicketsPorTipo.value[tipo] > 0)
+  if (primeiroTipoDisponivel) {
+    tipoPessoa.value = primeiroTipoDisponivel
   }
 }
 
@@ -289,10 +378,12 @@ async function buscar() {
   carregando.value = true
   buscou.value = false
   try {
-    const data = await $fetch<Pagamento[]>('/api/ticket/pagamentos-cpf', {
+    const data = await $fetch<TicketResumo>('/api/ticket/pagamentos-cpf', {
       query: { cpf: cpfDigits.value },
     })
-    pagamentos.value = data
+    resumo.value = data
+    ajustarTipoPessoaPorSaldo()
+    quantidadeEntrega.value = maxTickets.value > 0 ? 1 : 0
   } catch (err) {
     console.error('Erro ao buscar:', err)
   } finally {
@@ -302,28 +393,29 @@ async function buscar() {
 }
 
 function abrirModal() {
+  ajustarTipoPessoaPorSaldo()
+  quantidadeEntrega.value = maxTickets.value > 0 ? 1 : 0
   modalRef.value?.showModal()
 }
 
 async function confirmarEntrega() {
-  if (totalTickets.value <= 0) return
+  if (!resumo.value || maxTickets.value <= 0 || quantidadeEntrega.value <= 0) return
+  if (quantidadeEntrega.value > maxTickets.value) return
   
-  const quantidade = totalTickets.value
+  const quantidade = quantidadeEntrega.value
   salvando.value = true
   try {
     await $fetch('/api/ticket/entrega', {
       method: 'POST',
       body: {
-        pagamento_ids: pagamentos.value.map(p => p.id),
+        cpf: resumo.value.cpf,
         tipo: tipoPessoa.value,
-        quantidade: totalTickets.value,
+        quantidade,
       },
     })
     modalRef.value?.close()
-    pagamentos.value = []
-    cpfDigits.value = ''
-    buscou.value = false
     sucessoEntrega.value = `Entrega de ${quantidade} ticket(s) registrada com sucesso!`
+    await buscar()
     await carregarTransacoes()
     setTimeout(() => { sucessoEntrega.value = null }, 5000)
   } catch (err) {
@@ -385,6 +477,12 @@ function traducaoSituacaoClasse(codigo: string): string {
 
 carregarPrecos()
 carregarTransacoes()
+
+watch(tipoPessoa, () => {
+  if (quantidadeEntrega.value > maxTickets.value) {
+    quantidadeEntrega.value = maxTickets.value > 0 ? maxTickets.value : 0
+  }
+})
 
 function formatarDataHora(data: string): string {
   if (!data) return '—'

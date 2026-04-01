@@ -17,10 +17,7 @@
 
     <div v-else class="card bg-base-100 shadow-sm">
       <div class="card-body p-0">
-        <SisgruTabelaPagamentos
-          :pagamentos="pagamentos"
-          @marcar-ticket="marcarTicket"
-        />
+        <SisgruTabelaPagamentos :pagamentos="pagamentos" />
       </div>
     </div>
   </div>
@@ -56,21 +53,6 @@ async function buscarPagamentos() {
     pagamentos.value = []
   } finally {
     carregando.value = false
-  }
-}
-
-async function marcarTicket(id: number) {
-  erro.value = null
-  try {
-    const atualizado = await $fetch<PagamentoRow>(`/api/sisgru/pagamentos/${id}/ticket`, {
-      method: 'PATCH'
-    })
-    const idx = pagamentos.value.findIndex(p => p.id === id)
-    if (idx !== -1) {
-      pagamentos.value[idx] = atualizado
-    }
-  } catch {
-    erro.value = 'Erro ao marcar retirada do ticket. Tente novamente.'
   }
 }
 
