@@ -16,6 +16,8 @@ services:
       - .env.prod
     environment:
       - NODE_ENV=production
+    volumes:
+      - .secrets/sisgru.key:/run/secrets/sisgru.key:ro
     # Sem bind mount do código fonte (sem hot-reload)
 
   postgres:
