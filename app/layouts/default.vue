@@ -6,10 +6,15 @@
         <span class="text-xl font-bold text-neutral">Sistema Tesouraria</span>
       </div>
       <div class="flex-none gap-2">
-        <span v-if="auth.user.value" class="text-sm">{{ auth.user.value?.nome }}</span>
-        <button v-if="auth.user.value" class="btn btn-ghost btn-sm" @click="auth.logout()">
-          Sair
-        </button>
+        <div v-if="auth.user.value" class="dropdown dropdown-end">
+          <button tabindex="0" class="btn btn-ghost btn-sm">
+            {{ auth.user.value?.nome }}
+          </button>
+          <ul tabindex="0" class="menu menu-sm dropdown-content z-[1] mt-2 w-52 rounded-box bg-base-100 p-2 shadow">
+            <li><button @click="abrirModalTrocaSenha">Trocar senha</button></li>
+            <li><button @click="auth.logout()">Sair</button></li>
+          </ul>
+        </div>
       </div>
     </header>
 
@@ -115,9 +120,124 @@
     <footer class="footer footer-center p-4 bg-base-100 text-base-content">
       <p class="text-xs opacity-50">Sistema Tesouraria v1.0</p>
     </footer>
+
+    <div v-show="modalSenhaAberto" class="modal modal-open">
+      <div class="modal-box w-full max-w-md">
+        <h3 class="font-bold text-lg mb-4">Trocar minha senha</h3>
+
+        <div v-if="erroTrocaSenha" role="alert" class="alert alert-error mb-3">
+          <span>{{ erroTrocaSenha }}</span>
+        </div>
+        <div v-if="sucessoTrocaSenha" role="alert" class="alert alert-success mb-3">
+          <span>{{ sucessoTrocaSenha }}</span>
+        </div>
+
+        <div class="form-control mb-3">
+          <label class="label p-0 mb-1">
+            <span class="label-text">Senha atual</span>
+          </label>
+          <input v-model="senhaAtual" type="password" class="input input-bordered" autocomplete="current-password" />
+        </div>
+
+        <div class="form-control mb-3">
+          <label class="label p-0 mb-1">
+            <span class="label-text">Nova senha</span>
+          </label>
+          <input v-model="novaSenha" type="password" class="input input-bordered" autocomplete="new-password" />
+        </div>
+
+        <div class="form-control mb-3">
+          <label class="label p-0 mb-1">
+            <span class="label-text">Confirmar nova senha</span>
+          </label>
+          <input v-model="confirmarNovaSenha" type="password" class="input input-bordered" autocomplete="new-password" />
+        </div>
+
+        <p v-if="erroTamanhoNovaSenha" class="text-error text-sm">{{ erroTamanhoNovaSenha }}</p>
+        <p v-else-if="erroConfirmacao" class="text-error text-sm">{{ erroConfirmacao }}</p>
+
+        <div class="modal-action">
+          <button class="btn btn-ghost" @click="fecharModalTrocaSenha" :disabled="salvandoTrocaSenha">Cancelar</button>
+          <button class="btn btn-primary" @click="trocarMinhaSenha" :disabled="salvandoTrocaSenha || !!erroConfirmacao || !!erroTamanhoNovaSenha || !senhaAtual || !novaSenha || !confirmarNovaSenha">
+            <span v-if="salvandoTrocaSenha" class="loading loading-spinner loading-sm" />
+            <span v-else>Salvar</span>
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 const auth = useAuth()
+
+const modalSenhaAberto = ref(false)
+const senhaAtual = ref('')
+const novaSenha = ref('')
+const confirmarNovaSenha = ref('')
+const erroTrocaSenha = ref<string | null>(null)
+const sucessoTrocaSenha = ref<string | null>(null)
+const salvandoTrocaSenha = ref(false)
+
+const erroConfirmacao = computed(() => {
+  if (!confirmarNovaSenha.value) return null
+  if (novaSenha.value !== confirmarNovaSenha.value) {
+    return 'A confirmação da senha não confere.'
+  }
+  return null
+})
+
+const erroTamanhoNovaSenha = computed(() => {
+  if (!novaSenha.value) return null
+  if (novaSenha.value.length < 8) {
+    return 'A nova senha deve ter ao menos 8 caracteres.'
+  }
+  return null
+})
+
+function abrirModalTrocaSenha() {
+  modalSenhaAberto.value = true
+  erroTrocaSenha.value = null
+  sucessoTrocaSenha.value = null
+  senhaAtual.value = ''
+  novaSenha.value = ''
+  confirmarNovaSenha.value = ''
+}
+
+function fecharModalTrocaSenha() {
+  modalSenhaAberto.value = false
+}
+
+async function trocarMinhaSenha() {
+  if (erroConfirmacao.value || erroTamanhoNovaSenha.value) return
+
+  erroTrocaSenha.value = null
+  sucessoTrocaSenha.value = null
+  salvandoTrocaSenha.value = true
+
+  try {
+    await $fetch('/api/auth/trocar-senha', {
+      method: 'POST',
+      body: {
+        senha_atual: senhaAtual.value,
+        nova_senha: novaSenha.value,
+      },
+    })
+
+    sucessoTrocaSenha.value = 'Senha atualizada com sucesso.'
+    senhaAtual.value = ''
+    novaSenha.value = ''
+    confirmarNovaSenha.value = ''
+  } catch (err: unknown) {
+    const data = (err as { data?: { statusMessage?: string; data?: Record<string, string[] | undefined> } })?.data
+    const fieldErrors = data?.data
+    const message = data?.statusMessage
+      ?? fieldErrors?.senha_atual?.[0]
+      ?? fieldErrors?.nova_senha?.[0]
+      ?? (err instanceof Error ? err.message : '')
+    erroTrocaSenha.value = message || 'Não foi possível trocar a senha.'
+  } finally {
+    salvandoTrocaSenha.value = false
+  }
+}
 </script>

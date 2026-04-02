@@ -96,7 +96,7 @@ docker compose exec nuxt node -e "
 Depois do seed, voce pode entrar na aplicacao com o admin inicial criado pelo seed.
 
 Credenciais (do seed):
-- Email: `admin@tesouraria.local`
+- Email: `admin@concordia.ifc.edu.br`
 - Senha: `Admin@123456` (verifique no comentario do proprio `seed.sql`, caso voce tenha alterado o hash)
 
 ## 8. (Opcional) SISGRU sync

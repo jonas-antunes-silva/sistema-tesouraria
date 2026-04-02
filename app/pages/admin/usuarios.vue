@@ -63,11 +63,12 @@
                   <th>Email</th>
                   <th>Grupos</th>
                   <th>Ativo</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-if="usuarios.length === 0">
-                  <td colspan="4" class="text-center text-base-content/60 py-8">
+                  <td colspan="5" class="text-center text-base-content/60 py-8">
                     Nenhum usuário encontrado
                   </td>
                 </tr>
@@ -76,18 +77,112 @@
                   <td>{{ u.nome }}</td>
                   <td class="font-mono text-xs">{{ u.email }}</td>
                   <td class="text-sm">
-                    <span v-if="u.grupos.length > 0">{{ u.grupos.join(', ') }}</span>
-                    <span v-else class="text-base-content/60">—</span>
+                    <button 
+                      @click="abrirModalGrupos(u)" 
+                      class="link link-primary"
+                      :disabled="carregandoGrupos"
+                    >
+                      <span v-if="u.grupos.length > 0">{{ u.grupos.join(', ') }}</span>
+                      <span v-else class="text-base-content/60">Sem grupos</span>
+                    </button>
                   </td>
                   <td>
                     <span class="badge" :class="u.ativo ? 'badge-success' : 'badge-neutral'">
                       {{ u.ativo ? 'Sim' : 'Não' }}
                     </span>
                   </td>
+                  <td>
+                    <button class="btn btn-xs btn-outline" @click="abrirModalSenhaAdmin(u)">
+                      Trocar senha
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <div v-show="modalSenhaAdminAberto" class="modal modal-open">
+      <div class="modal-box w-full max-w-md">
+        <h3 class="font-bold text-lg mb-4">
+          Trocar senha: <span class="text-primary">{{ usuarioSenhaSelecionado?.nome }}</span>
+        </h3>
+
+        <div v-if="erroSenhaAdmin" role="alert" class="alert alert-error mb-3">
+          <span>{{ erroSenhaAdmin }}</span>
+        </div>
+
+        <div class="form-control mb-3">
+          <label class="label p-0 mb-1">
+            <span class="label-text">Nova senha</span>
+          </label>
+          <input v-model="novaSenhaAdmin" type="password" class="input input-bordered" autocomplete="new-password" />
+        </div>
+
+        <div class="form-control mb-3">
+          <label class="label p-0 mb-1">
+            <span class="label-text">Confirmar nova senha</span>
+          </label>
+          <input v-model="confirmarNovaSenhaAdmin" type="password" class="input input-bordered" autocomplete="new-password" />
+        </div>
+
+        <p v-if="erroTamanhoSenhaAdmin" class="text-error text-sm">{{ erroTamanhoSenhaAdmin }}</p>
+        <p v-else-if="erroConfirmacaoSenhaAdmin" class="text-error text-sm">{{ erroConfirmacaoSenhaAdmin }}</p>
+
+        <div class="modal-action">
+          <button class="btn btn-ghost" @click="fecharModalSenhaAdmin" :disabled="carregandoSenhaAdmin">Cancelar</button>
+          <button class="btn btn-primary" @click="salvarSenhaAdmin" :disabled="carregandoSenhaAdmin || !!erroConfirmacaoSenhaAdmin || !!erroTamanhoSenhaAdmin || !novaSenhaAdmin || !confirmarNovaSenhaAdmin">
+            <span v-if="carregandoSenhaAdmin" class="loading loading-spinner loading-sm" />
+            <span v-else>Salvar</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para gerenciar grupos -->
+    <div v-show="modalAberto" class="modal modal-open">
+      <div class="modal-box w-full max-w-md">
+        <h3 class="font-bold text-lg mb-4">
+          Grupos: <span class="text-primary">{{ usuarioSelecionado?.nome }}</span>
+        </h3>
+
+        <div v-if="erroModal" role="alert" class="alert alert-error mb-4">
+          <span>{{ erroModal }}</span>
+        </div>
+
+        <div class="form-control max-h-96 overflow-y-auto mb-6">
+          <label v-for="g in gruposDisponiveis" :key="g.id" class="label cursor-pointer justify-start gap-3">
+            <input 
+              type="checkbox" 
+              class="checkbox checkbox-primary" 
+              :checked="gruposAtribudosIds.includes(g.id)"
+              @change="(e) => toggleGrupo(g.id, (e.target as HTMLInputElement).checked)"
+            />
+            <span class="label-text flex-1">
+              <span class="font-medium">{{ g.nome }}</span>
+              <span v-if="g.descricao" class="block text-xs text-base-content/60">{{ g.descricao }}</span>
+            </span>
+          </label>
+        </div>
+
+        <div class="modal-action">
+          <button 
+            @click="fecharModalGrupos" 
+            class="btn btn-ghost"
+            :disabled="carregandoGrupos"
+          >
+            Cancelar
+          </button>
+          <button 
+            @click="salvarGrupos" 
+            class="btn btn-primary"
+            :disabled="carregandoGrupos"
+          >
+            <span v-if="carregandoGrupos" class="loading loading-spinner loading-sm" />
+            <span v-else>Salvar</span>
+          </button>
         </div>
       </div>
     </div>
@@ -111,6 +206,21 @@ const usuarios = ref<UsuarioRow[]>([])
 const erro = ref<string | null>(null)
 
 const carregandoCriar = ref(false)
+const carregandoGrupos = ref(false)
+const carregandoSenhaAdmin = ref(false)
+
+const modalSenhaAdminAberto = ref(false)
+const usuarioSenhaSelecionado = ref<UsuarioRow | null>(null)
+const novaSenhaAdmin = ref('')
+const confirmarNovaSenhaAdmin = ref('')
+const erroSenhaAdmin = ref<string | null>(null)
+
+// Modal de grupos
+const modalAberto = ref(false)
+const usuarioSelecionado = ref<UsuarioRow | null>(null)
+const gruposDisponiveis = ref<Array<{ id: string; nome: string; descricao: string | null }>>([])
+const gruposAtribudosIds = ref<string[]>([])
+const erroModal = ref<string | null>(null)
 
 const form = ref({
   nome: '',
@@ -120,6 +230,22 @@ const form = ref({
 })
 
 const erros = ref<Record<string, string>>({})
+
+const erroConfirmacaoSenhaAdmin = computed(() => {
+  if (!confirmarNovaSenhaAdmin.value) return null
+  if (novaSenhaAdmin.value !== confirmarNovaSenhaAdmin.value) {
+    return 'A confirmação da senha não confere.'
+  }
+  return null
+})
+
+const erroTamanhoSenhaAdmin = computed(() => {
+  if (!novaSenhaAdmin.value) return null
+  if (novaSenhaAdmin.value.length < 8) {
+    return 'A nova senha deve ter ao menos 8 caracteres.'
+  }
+  return null
+})
 
 const schema = z.object({
   nome: z.string().min(2, 'Nome deve ter ao menos 2 caracteres'),
@@ -135,6 +261,110 @@ async function carregarUsuarios() {
   } catch {
     erro.value = 'Erro ao carregar usuários.'
     usuarios.value = []
+  }
+}
+
+async function carregarGrupos() {
+  try {
+    gruposDisponiveis.value = await $fetch<Array<{ id: string; nome: string; descricao: string | null }>>('/api/usuarios/grupos-disponiveis')
+  } catch {
+    erroModal.value = 'Erro ao carregar grupos disponíveis.'
+    gruposDisponiveis.value = []
+  }
+}
+
+async function abrirModalGrupos(usuario: UsuarioRow) {
+  usuarioSelecionado.value = usuario
+  gruposAtribudosIds.value = []
+  erroModal.value = null
+  
+  carregandoGrupos.value = true
+  try {
+    await carregarGrupos()
+    // Mapeia nomes de grupos para IDs
+    gruposAtribudosIds.value = gruposDisponiveis.value
+      .filter((g) => usuario.grupos.includes(g.nome))
+      .map((g) => g.id)
+    modalAberto.value = true
+  } finally {
+    carregandoGrupos.value = false
+  }
+}
+
+function fecharModalGrupos() {
+  modalAberto.value = false
+  usuarioSelecionado.value = null
+  gruposAtribudosIds.value = []
+  erroModal.value = null
+}
+
+function toggleGrupo(grupoId: string, marcado: boolean) {
+  if (marcado) {
+    if (!gruposAtribudosIds.value.includes(grupoId)) {
+      gruposAtribudosIds.value.push(grupoId)
+    }
+  } else {
+    gruposAtribudosIds.value = gruposAtribudosIds.value.filter((id) => id !== grupoId)
+  }
+}
+
+async function salvarGrupos() {
+  if (!usuarioSelecionado.value) return
+
+  erroModal.value = null
+  carregandoGrupos.value = true
+
+  try {
+    await $fetch(`/api/usuarios/${usuarioSelecionado.value.id}`, {
+      method: 'PATCH',
+      body: { grupo_ids: gruposAtribudosIds.value },
+    })
+
+    // Recarrega lista de usuários
+    await carregarUsuarios()
+    fecharModalGrupos()
+  } catch {
+    erroModal.value = 'Erro ao salvar grupos.'
+  } finally {
+    carregandoGrupos.value = false
+  }
+}
+
+function abrirModalSenhaAdmin(usuario: UsuarioRow) {
+  usuarioSenhaSelecionado.value = usuario
+  novaSenhaAdmin.value = ''
+  confirmarNovaSenhaAdmin.value = ''
+  erroSenhaAdmin.value = null
+  modalSenhaAdminAberto.value = true
+}
+
+function fecharModalSenhaAdmin() {
+  modalSenhaAdminAberto.value = false
+  usuarioSenhaSelecionado.value = null
+}
+
+async function salvarSenhaAdmin() {
+  if (!usuarioSenhaSelecionado.value || erroConfirmacaoSenhaAdmin.value || erroTamanhoSenhaAdmin.value) return
+
+  erroSenhaAdmin.value = null
+  carregandoSenhaAdmin.value = true
+
+  try {
+    await $fetch(`/api/usuarios/${usuarioSenhaSelecionado.value.id}/senha`, {
+      method: 'PATCH',
+      body: { nova_senha: novaSenhaAdmin.value },
+    })
+
+    fecharModalSenhaAdmin()
+  } catch (err: unknown) {
+    const data = (err as { data?: { statusMessage?: string; data?: Record<string, string[] | undefined> } })?.data
+    const fieldErrors = data?.data
+    const message = data?.statusMessage
+      ?? fieldErrors?.nova_senha?.[0]
+      ?? (err instanceof Error ? err.message : '')
+    erroSenhaAdmin.value = message || 'Erro ao alterar senha do usuário.'
+  } finally {
+    carregandoSenhaAdmin.value = false
   }
 }
 
