@@ -22,6 +22,10 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 
+# Keep source files and dependencies in runtime so maintenance commands
+# (e.g. migrations with tsx) can run inside the production container.
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 COPY --from=builder /app/.output ./.output
 
 EXPOSE 3000

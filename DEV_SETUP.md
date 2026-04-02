@@ -124,25 +124,29 @@ direto com `node .output/server/index.mjs`.
 2. Garanta os certificados TLS em:
    - `ssl/prod/cert.pem`
    - `ssl/prod/key.pem`
+3. Garanta que a senha no `DATABASE_URL` esteja com URL encoding quando tiver caracteres especiais.
+  - Exemplo: `@` vira `%40`, `#` vira `%23`, `!` vira `%21`.
+4. Se for usar SISGRU, garanta o arquivo de chave em `.secrets/sisgru.key` e use:
+  - `SISGRU_PRIVATE_KEY_PATH=/run/secrets/sisgru.key`
 
 ### 10.2 Subir stack de producao
 
-Use compose base + override de producao:
+Use o compose dedicado de producao:
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d --build
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
 ```
 
 ### 10.3 Rodar migrations em producao
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod exec nuxt npx tsx server/db/migrate.ts
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec nuxt npx tsx server/db/migrate.ts
 ```
 
 ### 10.4 Seed inicial (somente primeiro deploy)
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod exec nuxt node -e "
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec nuxt node -e "
   const fs = require('fs');
   const { Pool } = require('pg');
   const sql = fs.readFileSync('server/db/seed.sql', 'utf8');
@@ -156,8 +160,8 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.
 ### 10.5 Verificacao rapida
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod ps
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod logs -f nginx nuxt postgres
+docker compose -f docker-compose.prod.yml --env-file .env.prod ps
+docker compose -f docker-compose.prod.yml --env-file .env.prod logs -f nginx nuxt postgres
 ```
 
 ### 10.6 Atualizacao de versao
@@ -166,7 +170,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.
 2. Execute novamente:
 
 ```bash
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d --build
-docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod exec nuxt npx tsx server/db/migrate.ts
+docker compose -f docker-compose.prod.yml --env-file .env.prod up -d --build
+docker compose -f docker-compose.prod.yml --env-file .env.prod exec nuxt npx tsx server/db/migrate.ts
 ```
 
