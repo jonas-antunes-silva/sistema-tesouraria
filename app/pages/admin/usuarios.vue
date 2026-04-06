@@ -104,7 +104,7 @@
       </div>
     </div>
 
-    <div v-show="modalSenhaAdminAberto" class="modal modal-open">
+    <div v-if="modalSenhaAdminAberto" class="modal modal-open">
       <div class="modal-box w-full max-w-md">
         <h3 class="font-bold text-lg mb-4">
           Trocar senha: <span class="text-primary">{{ usuarioSenhaSelecionado?.nome }}</span>
@@ -142,7 +142,7 @@
     </div>
 
     <!-- Modal para gerenciar grupos -->
-    <div v-show="modalAberto" class="modal modal-open">
+    <div v-if="modalAberto" class="modal modal-open">
       <div class="modal-box w-full max-w-md">
         <h3 class="font-bold text-lg mb-4">
           Grupos: <span class="text-primary">{{ usuarioSelecionado?.nome }}</span>

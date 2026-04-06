@@ -78,7 +78,7 @@
             </div>
           </div>
 
-          <div class="overflow-x-auto">
+          <div class="max-h-[40vh] overflow-auto">
             <table class="table table-zebra text-left">
               <thead>
                 <tr>
@@ -128,7 +128,7 @@
           Nenhuma transação hoje
         </div>
         
-        <div v-else class="overflow-x-auto">
+        <div v-else class="max-h-[50vh] overflow-auto">
           <table class="table table-zebra text-left">
             <thead>
               <tr>

@@ -1,5 +1,5 @@
 <template>
-  <div class="overflow-x-auto">
+  <div class="max-h-[70vh] overflow-auto">
     <table class="table table-zebra table-hover w-full">
       <thead>
         <tr>

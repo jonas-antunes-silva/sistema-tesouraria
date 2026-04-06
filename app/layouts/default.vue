@@ -18,7 +18,7 @@
       </div>
     </header>
 
-    <div class="flex">
+    <div class="flex bg-base-100">
       <ClientOnly>
         <aside v-if="auth.user.value" class="w-64 min-h-screen bg-base-100 p-4">
           <ul class="menu">
@@ -112,7 +112,7 @@
         </template>
       </ClientOnly>
 
-      <main class="flex-1 p-6 bg-gray-50 shadow-[inset_0_2px_8px_rgba(0,0,0,0.1)] rounded-tl-lg -ml-2 -mt-2">
+      <main class="flex-1 min-w-0 p-6 bg-[#f8fafb] rounded-tl-2xl border-l border-t border-[#e6eaee] shadow-[inset_0_1px_8px_rgba(15,23,42,0.05)]">
         <slot />
       </main>
     </div>
@@ -121,7 +121,7 @@
       <p class="text-xs opacity-50">Sistema Tesouraria v1.0</p>
     </footer>
 
-    <div v-show="modalSenhaAberto" class="modal modal-open">
+    <div v-if="modalSenhaAberto" class="modal modal-open">
       <div class="modal-box w-full max-w-md">
         <h3 class="font-bold text-lg mb-4">Trocar minha senha</h3>
 
