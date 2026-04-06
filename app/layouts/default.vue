@@ -1,6 +1,6 @@
 <template>
-  <div class="min-h-screen bg-base-200" data-theme="emerald">
-    <header class="navbar bg-base-100 px-4">
+  <div class="h-screen bg-base-200 flex flex-col overflow-hidden" data-theme="emerald">
+    <header class="navbar bg-base-100 px-4 shrink-0">
       <div class="flex-1 flex items-center gap-3">
         <img src="/logo.svg" alt="Logo" class="h-8" />
         <span class="text-xl font-bold text-neutral">Sistema Tesouraria</span>
@@ -18,9 +18,9 @@
       </div>
     </header>
 
-    <div class="flex bg-base-100">
+    <div class="flex flex-1 min-h-0 bg-base-100 overflow-hidden">
       <ClientOnly>
-        <aside v-if="auth.user.value" class="w-64 min-h-screen bg-base-100 p-4">
+        <aside v-if="auth.user.value" class="w-64 h-full bg-base-100 p-4 overflow-y-auto shrink-0">
           <ul class="menu">
             <li>
               <NuxtLink to="/" class="flex items-center gap-2">
@@ -108,16 +108,16 @@
           </ul>
         </aside>
         <template #fallback>
-          <aside class="w-64 min-h-screen bg-base-100 p-4" />
+          <aside class="w-64 h-full bg-base-100 p-4 shrink-0" />
         </template>
       </ClientOnly>
 
-      <main class="flex-1 min-w-0 p-6 bg-[#f8fafb] rounded-tl-2xl border-l border-t border-[#e6eaee] shadow-[inset_0_1px_8px_rgba(15,23,42,0.05)]">
+      <main class="flex-1 min-w-0 h-full overflow-y-auto p-6 bg-[#f8fafb] rounded-tl-2xl border-l border-t border-[#e6eaee] shadow-[inset_0_1px_8px_rgba(15,23,42,0.05)]">
         <slot />
       </main>
     </div>
 
-    <footer class="footer footer-center p-4 bg-base-100 text-base-content">
+    <footer class="footer footer-center p-4 bg-base-100 text-base-content shrink-0">
       <p class="text-xs opacity-50">Sistema Tesouraria v1.0</p>
     </footer>
 

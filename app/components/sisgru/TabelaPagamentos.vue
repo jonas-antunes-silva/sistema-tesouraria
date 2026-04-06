@@ -1,5 +1,5 @@
 <template>
-  <div class="max-h-[70vh] overflow-auto">
+  <div class="overflow-x-auto">
     <table class="table table-zebra table-hover w-full">
       <thead>
         <tr>
@@ -7,6 +7,7 @@
           <th class="w-32">Código</th> -->
           <th class="w-48">Contribuinte</th>
           <th class="w-32">CPF</th>
+          <th class="w-40">Número de Referência</th>
           <th class="w-64">
             <div class="dropdown dropdown-hover dropdown-bottom dropdown-end">
               <label tabindex="0" class="flex items-center gap-1 cursor-pointer">
@@ -42,7 +43,7 @@
       </thead>
       <tbody>
         <tr v-if="pagamentosFiltrados.length === 0">
-          <td colspan="8" class="text-center text-base-content/60 py-8">
+          <td colspan="9" class="text-center text-base-content/60 py-8">
             Nenhum registro encontrado
           </td>
         </tr>
@@ -52,6 +53,7 @@
             <td class="font-mono text-xs">{{ p.codigo }}</td> -->
             <td>{{ p.nome_contribuinte }}</td>
             <td class="font-mono text-xs">{{ formatarCpf(p.codigo_contribuinte) }}</td>
+            <td>{{ p.numero_referencia ?? '—' }}</td>
             <td>{{ p.servico_nome }}</td>
             <td>{{ formatarMoeda(p.valor_total) }}</td>
             <td>
@@ -76,7 +78,7 @@
       </tbody>
       <tfoot v-if="pagamentosFiltrados.length > 0">
         <tr>
-          <td colspan="4" class="font-semibold text-neutral text-base">
+          <td colspan="5" class="font-semibold text-neutral text-base">
             Total: {{ pagamentosFiltrados.length }} registro{{ pagamentosFiltrados.length !== 1 ? 's' : '' }}
           </td>
           <td class="text-right font-semibold text-neutral text-base">{{ formatarMoeda(somaTotal) }}</td>
@@ -93,6 +95,7 @@ export interface PagamentoRow {
   codigo: string
   nome_contribuinte: string
   codigo_contribuinte: string
+  numero_referencia: number | null
   servico_nome: string
   servico_id: number
   valor_total: number
@@ -134,7 +137,9 @@ const pagamentosFiltrados = computed(() =>
 )
 
 const somaTotal = computed(() =>
-  pagamentosFiltrados.value.reduce((acc, p) => acc + Number(p.valor_total), 0)
+  pagamentosFiltrados.value
+    .filter((p) => p.situacao === 'CO')
+    .reduce((acc, p) => acc + Number(p.valor_total), 0)
 )
 
 function toggleServico(id: string) {

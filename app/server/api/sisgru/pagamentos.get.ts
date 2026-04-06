@@ -29,6 +29,7 @@ export default defineEventHandler(async (event) => {
               sp.codigo,
               sp.codigo_contribuinte,
               sp.nome_contribuinte,
+              sp.numero_referencia,
               sp.servico_id,
               sp.servico_nome,
               sp.valor_total,
