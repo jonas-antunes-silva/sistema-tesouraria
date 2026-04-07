@@ -54,7 +54,29 @@
             <td>{{ p.nome_contribuinte }}</td>
             <td class="font-mono text-xs">{{ formatarCpf(p.codigo_contribuinte) }}</td>
             <td>{{ p.numero_referencia ?? '—' }}</td>
-            <td>{{ p.servico_nome }}</td>
+            <td>
+              <div class="flex items-center gap-2">
+                <span>{{ p.servico_nome }}</span>
+                <button
+                  v-if="p.situacao === 'CO'"
+                  class="btn btn-ghost btn-xs"
+                  title="Retificar serviço"
+                  @click="abrirRetificacao(p)"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="h-4 w-4" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7h11m0 0l-3-3m3 3l-3 3M20 17H9m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                </button>
+                <button
+                  v-if="p.retificado"
+                  class="badge badge-info badge-outline cursor-pointer"
+                  title="Ver histórico de retificações"
+                  @click="abrirHistorico(p)"
+                >
+                  Retificado
+                </button>
+              </div>
+            </td>
             <td>{{ formatarMoeda(p.valor_total) }}</td>
             <td>
               <span
@@ -82,11 +104,95 @@
             Total: {{ pagamentosFiltrados.length }} registro{{ pagamentosFiltrados.length !== 1 ? 's' : '' }}
           </td>
           <td class="text-right font-semibold text-neutral text-base">{{ formatarMoeda(somaTotal) }}</td>
-          <td colspan="4"></td>
+          <td colspan="3"></td>
         </tr>
       </tfoot>
     </table>
   </div>
+
+  <dialog ref="retificacaoModal" class="modal">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Retificar tipo de serviço</h3>
+
+      <p v-if="pagamentoSelecionado" class="text-sm mt-2">
+        Pagamento #{{ pagamentoSelecionado.id }} - {{ pagamentoSelecionado.nome_contribuinte }}
+      </p>
+      <p v-if="pagamentoSelecionado" class="text-sm text-base-content/70">
+        Serviço atual: {{ pagamentoSelecionado.servico_nome }}
+      </p>
+
+      <div class="form-control mt-4">
+        <label class="label" for="novo-servico">
+          <span class="label-text">Novo tipo de serviço</span>
+        </label>
+        <select id="novo-servico" v-model="novoServicoSelecionado" class="select select-bordered w-full">
+          <option disabled value="">Selecione...</option>
+          <option v-for="servico in opcoesRetificacao" :key="servico.id" :value="servico.id">
+            {{ servico.nome }}
+          </option>
+        </select>
+      </div>
+
+      <div v-if="erroRetificacao" class="alert alert-error mt-4 py-2">
+        <span>{{ erroRetificacao }}</span>
+      </div>
+
+      <div class="modal-action">
+        <button class="btn btn-ghost" :disabled="retificando" @click="fecharRetificacao">Cancelar</button>
+        <button class="btn btn-primary" :disabled="retificando || !novoServicoSelecionado" @click="confirmarRetificacao">
+          <span v-if="retificando" class="loading loading-spinner loading-xs"></span>
+          Confirmar
+        </button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button @click="fecharRetificacao">close</button>
+    </form>
+  </dialog>
+
+  <dialog ref="historicoModal" class="modal">
+    <div class="modal-box max-w-3xl">
+      <h3 class="font-bold text-lg">Histórico de retificações</h3>
+
+      <div v-if="carregandoHistorico" class="flex justify-center py-8">
+        <span class="loading loading-spinner loading-md"></span>
+      </div>
+
+      <div v-else-if="historicoRetificacoes.length === 0" class="py-6 text-base-content/70">
+        Nenhuma retificação registrada para este pagamento.
+      </div>
+
+      <div v-else class="overflow-x-auto mt-4">
+        <table class="table table-zebra w-full">
+          <thead>
+            <tr>
+              <th>Quando</th>
+              <th>Troca</th>
+              <th>Por</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in historicoRetificacoes" :key="item.id">
+              <td>{{ formatarDataHora(item.retificado_em) }}</td>
+              <td>
+                {{ item.servico_nome_anterior }}
+                <span class="text-base-content/50">→</span>
+                {{ item.servico_nome_novo }}
+              </td>
+              <td>{{ item.retificado_por_nome }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="modal-action">
+        <button class="btn" @click="fecharHistorico">Fechar</button>
+      </div>
+    </div>
+    <form method="dialog" class="modal-backdrop">
+      <button @click="fecharHistorico">close</button>
+    </form>
+  </dialog>
 </template>
 
 <script setup lang="ts">
@@ -106,6 +212,19 @@ export interface PagamentoRow {
   data_pagamento_psp: string | null
   dt_criacao: string
   sincronizado_em: string
+  retificado: boolean
+  retificado_em: string | null
+}
+
+interface RetificacaoHistoricoRow {
+  id: number
+  servico_id_anterior: number
+  servico_nome_anterior: string
+  servico_id_novo: number
+  servico_nome_novo: string
+  retificado_por: string
+  retificado_por_nome: string
+  retificado_em: string
 }
 
 interface ServicoOpcao {
@@ -115,6 +234,10 @@ interface ServicoOpcao {
 
 const props = defineProps<{
   pagamentos: PagamentoRow[]
+}>()
+
+const emit = defineEmits<{
+  retificado: []
 }>()
 
 const servicosUnicos = computed<ServicoOpcao[]>(() => {
@@ -141,6 +264,96 @@ const somaTotal = computed(() =>
     .filter((p) => p.situacao === 'CO')
     .reduce((acc, p) => acc + Number(p.valor_total), 0)
 )
+
+const retificacaoModal = ref<HTMLDialogElement | null>(null)
+const historicoModal = ref<HTMLDialogElement | null>(null)
+const pagamentoSelecionado = ref<PagamentoRow | null>(null)
+const novoServicoSelecionado = ref<string>('')
+const retificando = ref(false)
+const erroRetificacao = ref<string | null>(null)
+
+const carregandoHistorico = ref(false)
+const historicoRetificacoes = ref<RetificacaoHistoricoRow[]>([])
+
+const opcoesRetificacao = computed<ServicoOpcao[]>(() => {
+  const atual = pagamentoSelecionado.value
+  if (!atual) return []
+  return servicosUnicos.value.filter((s) => Number(s.id) !== atual.servico_id)
+})
+
+function abrirRetificacao(pagamento: PagamentoRow): void {
+  pagamentoSelecionado.value = pagamento
+  novoServicoSelecionado.value = ''
+  erroRetificacao.value = null
+  retificacaoModal.value?.showModal()
+}
+
+function fecharRetificacao(): void {
+  if (retificando.value) return
+  retificacaoModal.value?.close()
+}
+
+function mensagemErroApi(err: unknown, fallback: string): string {
+  if (err && typeof err === 'object') {
+    const maybeData = (err as { data?: { statusMessage?: string } }).data
+    if (maybeData?.statusMessage) return maybeData.statusMessage
+    const maybeStatus = (err as { statusMessage?: string }).statusMessage
+    if (maybeStatus) return maybeStatus
+  }
+  return fallback
+}
+
+async function confirmarRetificacao(): Promise<void> {
+  const pagamento = pagamentoSelecionado.value
+  if (!pagamento || !novoServicoSelecionado.value) return
+
+  const novoServico = servicosUnicos.value.find((s) => s.id === novoServicoSelecionado.value)
+  if (!novoServico) {
+    erroRetificacao.value = 'Serviço selecionado inválido'
+    return
+  }
+
+  retificando.value = true
+  erroRetificacao.value = null
+
+  try {
+    await $fetch(`/api/sisgru/pagamentos/${pagamento.id}/retificar`, {
+      method: 'POST',
+      body: {
+        novo_servico_id: Number(novoServico.id),
+        novo_servico_nome: novoServico.nome,
+      },
+    })
+
+    fecharRetificacao()
+    emit('retificado')
+  } catch (err: unknown) {
+    erroRetificacao.value = mensagemErroApi(err, 'Não foi possível retificar este pagamento')
+  } finally {
+    retificando.value = false
+  }
+}
+
+async function abrirHistorico(pagamento: PagamentoRow): Promise<void> {
+  pagamentoSelecionado.value = pagamento
+  historicoRetificacoes.value = []
+  carregandoHistorico.value = true
+  historicoModal.value?.showModal()
+
+  try {
+    historicoRetificacoes.value = await $fetch<RetificacaoHistoricoRow[]>(
+      `/api/sisgru/pagamentos/${pagamento.id}/retificacoes`,
+    )
+  } catch {
+    historicoRetificacoes.value = []
+  } finally {
+    carregandoHistorico.value = false
+  }
+}
+
+function fecharHistorico(): void {
+  historicoModal.value?.close()
+}
 
 function toggleServico(id: string) {
   const idx = servicosSelecionados.value.indexOf(id)
@@ -190,12 +403,6 @@ function formatarDataHora(data: string | null | undefined): string {
     return `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y} ${String(h).padStart(2, '0')}:${minute}`
   }
   return data
-}
-
-function mascaraCpf(cpf: string): string {
-  const digits = cpf.replace(/\D/g, '')
-  if (digits.length !== 11) return cpf
-  return `***.${digits.slice(3, 6)}.${digits.slice(6, 9)}-**`
 }
 
 function formatarCpf(cpf: string): string {

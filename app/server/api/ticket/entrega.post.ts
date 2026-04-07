@@ -56,8 +56,8 @@ export default defineEventHandler(async (event) => {
       const nomeResult = await client.query<{ nome_contribuinte: string }>(
         `SELECT nome_contribuinte
          FROM sisgru_pagamentos
-         WHERE codigo_contribuinte = $1
-           AND servico_id = 14671
+         WHERE regexp_replace(codigo_contribuinte, '\\D', '', 'g') = $1
+           AND COALESCE(servico_id_retificado, servico_id) = 14671
          ORDER BY data DESC
          LIMIT 1`,
         [parsed.data.cpf],
@@ -71,8 +71,8 @@ export default defineEventHandler(async (event) => {
       const creditosResult = await client.query<{ total: string }>(
         `SELECT COALESCE(SUM(sp.valor_total), 0)::text AS total
          FROM sisgru_pagamentos sp
-         WHERE sp.codigo_contribuinte = $1
-           AND sp.servico_id = 14671
+         WHERE regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $1
+           AND COALESCE(sp.servico_id_retificado, sp.servico_id) = 14671
            AND sp.situacao = 'CO'`,
         [parsed.data.cpf],
       )
@@ -80,7 +80,8 @@ export default defineEventHandler(async (event) => {
       const consumidoResult = await client.query<{ total: string }>(
         `SELECT COALESCE(SUM(te.valor_consumido), 0)::text AS total
          FROM ticket_entregas te
-         WHERE te.cpf = $1`,
+         WHERE regexp_replace(te.cpf, '\\D', '', 'g') = $1
+           AND te.estornado = false`,
         [parsed.data.cpf],
       )
 

@@ -36,19 +36,28 @@ export default defineEventHandler(async (event) => {
       valor_total: string | number
       saldo_posterior: string | number
       registrado_em: string
+      estornado: boolean
+      estornado_em: string | null
+      estorno_motivo: string | null
+      estornado_por_nome: string | null
     }>(
       `SELECT
-         id,
-         cpf,
-         nome,
-         num_copias,
-         valor_por_copia,
-         valor_total,
-         saldo_posterior,
-         registrado_em
-       FROM reprografia_usos
-       WHERE ($1::text IS NULL OR regexp_replace(cpf, '\\D', '', 'g') = $1)
-       ORDER BY registrado_em DESC`,
+         ru.id,
+         ru.cpf,
+         ru.nome,
+         ru.num_copias,
+         ru.valor_por_copia,
+         ru.valor_total,
+         ru.saldo_posterior,
+         ru.registrado_em,
+         ru.estornado,
+         ru.estornado_em,
+         ru.estorno_motivo,
+         ue.nome AS estornado_por_nome
+       FROM reprografia_usos ru
+       LEFT JOIN usuarios ue ON ue.id = ru.estornado_por
+       WHERE ($1::text IS NULL OR regexp_replace(ru.cpf, '\\D', '', 'g') = $1)
+       ORDER BY ru.registrado_em DESC`,
       [cpfDigits ?? null],
     )
 

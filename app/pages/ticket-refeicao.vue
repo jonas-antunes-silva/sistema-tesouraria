@@ -140,6 +140,7 @@
                 <th>Qtd</th>
                 <th>Consumo</th>
                 <th>Saldo após</th>
+                <th>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -152,6 +153,18 @@
                 <td>{{ t.quantidade }}</td>
                 <td>{{ formatarMoeda(t.valor_consumido || 0) }}</td>
                 <td>{{ formatarMoeda(t.saldo_depois || 0) }}</td>
+                <td>
+                  <div v-if="t.estornado" class="text-xs">
+                    <span class="badge badge-warning">Estornado</span>
+                  </div>
+                  <button
+                    v-else
+                    class="btn btn-error btn-xs"
+                    @click="abrirModalEstorno(t)"
+                  >
+                    Estorno
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
@@ -239,6 +252,46 @@
         <button>close</button>
       </form>
     </dialog>
+
+    <dialog ref="modalEstornoRef" class="modal">
+      <div class="modal-box">
+        <h3 class="font-bold text-lg">Estorno de entrega de ticket</h3>
+
+        <div v-if="transacaoEstorno" class="py-4 space-y-2">
+          <p class="text-sm">Beneficiário: <strong>{{ transacaoEstorno.nome_contribuinte || '—' }}</strong></p>
+          <p class="text-sm">CPF: <strong>{{ transacaoEstorno.codigo_contribuinte ? formatarCpf(transacaoEstorno.codigo_contribuinte) : '—' }}</strong></p>
+          <p class="text-sm">Consumo registrado: <strong>{{ formatarMoeda(transacaoEstorno.valor_consumido || 0) }}</strong></p>
+
+          <div class="form-control mt-3">
+            <label class="label">
+              <span class="label-text font-medium">Motivo do estorno</span>
+            </label>
+            <textarea
+              v-model="motivoEstorno"
+              class="textarea textarea-bordered"
+              rows="4"
+              maxlength="500"
+              placeholder="Descreva o motivo do estorno"
+            ></textarea>
+          </div>
+
+          <div v-if="erroEstorno" role="alert" class="alert alert-error py-2">
+            <span>{{ erroEstorno }}</span>
+          </div>
+        </div>
+
+        <div class="modal-action">
+          <button class="btn btn-ghost" :disabled="salvandoEstorno" @click="fecharModalEstorno">Cancelar</button>
+          <button class="btn btn-error" :disabled="salvandoEstorno || motivoEstorno.trim().length < 3" @click="confirmarEstorno">
+            <span v-if="salvandoEstorno" class="loading loading-spinner loading-sm"></span>
+            Confirmar Estorno
+          </button>
+        </div>
+      </div>
+      <form method="dialog" class="modal-backdrop">
+        <button @click="fecharModalEstorno">close</button>
+      </form>
+    </dialog>
   </div>
 </template>
 
@@ -273,6 +326,10 @@ interface Transacao {
   responsavel_nome: string
   codigo_contribuinte: string | null
   nome_contribuinte: string | null
+  estornado: boolean
+  estornado_em: string | null
+  estorno_motivo: string | null
+  estornado_por_nome: string | null
 }
 
 const cpfDigits = ref('')
@@ -283,10 +340,15 @@ const carregando = ref(false)
 const carregandoTransacoes = ref(false)
 const salvando = ref(false)
 const modalRef = ref<HTMLDialogElement | null>(null)
+const modalEstornoRef = ref<HTMLDialogElement | null>(null)
 const tipoPessoa = ref<'estudante' | 'servidor' | 'visitante'>('servidor')
 const quantidadeEntrega = ref(1)
 const erroValidacao = ref<string | null>(null)
 const sucessoEntrega = ref<string | null>(null)
+const erroEstorno = ref<string | null>(null)
+const motivoEstorno = ref('')
+const salvandoEstorno = ref(false)
+const transacaoEstorno = ref<Transacao | null>(null)
 
 const precos = ref({
   estudante: 3,
@@ -434,6 +496,55 @@ async function carregarTransacoes() {
     console.error('Erro ao carregar transações:', err)
   } finally {
     carregandoTransacoes.value = false
+  }
+}
+
+function abrirModalEstorno(transacao: Transacao): void {
+  transacaoEstorno.value = transacao
+  motivoEstorno.value = ''
+  erroEstorno.value = null
+  modalEstornoRef.value?.showModal()
+}
+
+function fecharModalEstorno(): void {
+  if (salvandoEstorno.value) return
+  modalEstornoRef.value?.close()
+}
+
+function mensagemErroApi(err: unknown, fallback: string): string {
+  if (err && typeof err === 'object') {
+    const maybeData = (err as { data?: { statusMessage?: string } }).data
+    if (maybeData?.statusMessage) return maybeData.statusMessage
+    const maybeStatus = (err as { statusMessage?: string }).statusMessage
+    if (maybeStatus) return maybeStatus
+  }
+  return fallback
+}
+
+async function confirmarEstorno(): Promise<void> {
+  const transacao = transacaoEstorno.value
+  if (!transacao) return
+
+  salvandoEstorno.value = true
+  erroEstorno.value = null
+
+  try {
+    await $fetch(`/api/ticket/entregas/${transacao.id}/estorno`, {
+      method: 'POST',
+      body: {
+        motivo: motivoEstorno.value.trim(),
+      },
+    })
+
+    modalEstornoRef.value?.close()
+    await carregarTransacoes()
+    if (resumo.value?.cpf) {
+      await buscar()
+    }
+  } catch (err: unknown) {
+    erroEstorno.value = mensagemErroApi(err, 'Não foi possível estornar este registro')
+  } finally {
+    salvandoEstorno.value = false
   }
 }
 

@@ -30,8 +30,10 @@ export default defineEventHandler(async (event) => {
               sp.codigo_contribuinte,
               sp.nome_contribuinte,
               sp.numero_referencia,
-              sp.servico_id,
-              sp.servico_nome,
+              COALESCE(sp.servico_id_retificado, sp.servico_id) AS servico_id,
+              COALESCE(sp.servico_nome_retificado, sp.servico_nome) AS servico_nome,
+              sp.retificado,
+              sp.retificado_em,
               sp.valor_total,
               sp.situacao,
               sp.tipo_pagamento_nome,
@@ -45,7 +47,13 @@ export default defineEventHandler(async (event) => {
         ORDER BY sp.data DESC NULLS LAST, sp.id DESC`,
       [dataPostgres],
     )
-    return result.rows
+    return result.rows.map((row) => ({
+      ...row,
+      id: Number(row.id),
+      numero_referencia: row.numero_referencia == null ? null : Number(row.numero_referencia),
+      servico_id: Number(row.servico_id),
+      valor_total: Number(row.valor_total),
+    }))
   } catch {
     throw createError({ statusCode: 500, statusMessage: 'Erro interno' })
   }

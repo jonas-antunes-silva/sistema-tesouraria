@@ -21,7 +21,7 @@
       @registrar="handleRegistrarBaixa"
     />
 
-    <ReprografiaTabelaUsos :usos="usos" />
+    <ReprografiaTabelaUsos :usos="usos" @estornado="handleEstornoUso" />
   </div>
 </template>
 
@@ -124,6 +124,12 @@ async function handleRegistrarBaixa(numCopias: number) {
   } finally {
     carregandoBaixa.value = false
   }
+}
+
+async function handleEstornoUso() {
+  if (!credito.value) return
+  await carregarCredito(credito.value.cpf)
+  await carregarUsos(credito.value.cpf)
 }
 
 onMounted(async () => {

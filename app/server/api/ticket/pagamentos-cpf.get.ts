@@ -29,8 +29,8 @@ export default defineEventHandler(async (event) => {
       `SELECT sp.id, sp.codigo_contribuinte, sp.nome_contribuinte,
               sp.valor_total, sp.situacao, sp.data
        FROM sisgru_pagamentos sp
-       WHERE sp.codigo_contribuinte = $1
-         AND sp.servico_id = 14671
+       WHERE regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $1
+         AND COALESCE(sp.servico_id_retificado, sp.servico_id) = 14671
          AND sp.situacao = 'CO'
        ORDER BY sp.data DESC`,
       [parsed.data.cpf],
@@ -39,8 +39,8 @@ export default defineEventHandler(async (event) => {
     const totalCreditosResult = await query<{ total: string }>(
       `SELECT COALESCE(SUM(sp.valor_total), 0)::text AS total
        FROM sisgru_pagamentos sp
-       WHERE sp.codigo_contribuinte = $1
-         AND sp.servico_id = 14671
+       WHERE regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $1
+         AND COALESCE(sp.servico_id_retificado, sp.servico_id) = 14671
          AND sp.situacao = 'CO'`,
       [parsed.data.cpf],
     )
@@ -48,7 +48,8 @@ export default defineEventHandler(async (event) => {
     const totalConsumidoResult = await query<{ total: string }>(
       `SELECT COALESCE(SUM(te.valor_consumido), 0)::text AS total
        FROM ticket_entregas te
-       WHERE te.cpf = $1`,
+       WHERE regexp_replace(te.cpf, '\\D', '', 'g') = $1
+         AND te.estornado = false`,
       [parsed.data.cpf],
     )
 

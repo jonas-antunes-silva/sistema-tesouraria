@@ -17,7 +17,7 @@
 
     <div v-else class="card bg-base-100 shadow-sm">
       <div class="card-body p-0">
-        <SisgruTabelaPagamentos :pagamentos="pagamentos" />
+        <SisgruTabelaPagamentos :pagamentos="pagamentos" @retificado="buscarPagamentos" />
       </div>
     </div>
   </div>
