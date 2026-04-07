@@ -360,24 +360,28 @@ async function syncPagamentos(data: string): Promise<{ novos: number; total: num
 }
 
 /**
- * Sincroniza Pagamentos dos últimos 5 dias, um dia por requisição.
+ * Sincroniza pagamentos para uma lista de dias (offset em relação a hoje), um dia por requisição.
  */
-async function syncPagamentosDias(): Promise<{ novos: number; total: number }> {
+async function syncPagamentosPorDias(offsetDias: number[]): Promise<{ novos: number; total: number }> {
   let totalNovos = 0
   let totalGeral = 0
 
-  for (let i = 4; i >= 0; i--) {
+  for (const offset of offsetDias) {
     const data = new Date()
-    data.setDate(data.getDate() - i)
+    data.setDate(data.getDate() - offset)
     const dataFormatada = formatarData(data)
 
     try {
       const resultado = await syncPagamentos(dataFormatada)
       totalNovos += resultado.novos
       totalGeral += resultado.total
-      console.log(`[sisgruSync] Pagamentos dia ${dataFormatada}: ${resultado.novos} novos / ${resultado.total} total`)
+      console.log(
+        `[sisgruSync] Pagamentos dia ${dataFormatada}: ${resultado.novos} novos / ${resultado.total} total`,
+      )
     } catch (err) {
-      console.error(`[sisgruSync] Erro ao sincronizar Pagamentos do dia ${dataFormatada}: ${(err as Error).message}`)
+      console.error(
+        `[sisgruSync] Erro ao sincronizar Pagamentos do dia ${dataFormatada}: ${(err as Error).message}`,
+      )
     }
   }
 
@@ -385,52 +389,26 @@ async function syncPagamentosDias(): Promise<{ novos: number; total: number }> {
 }
 
 /**
- * Sincroniza GRUs e Pagamentos dos últimos 5 dias, um dia por requisição.
+ * Sincroniza apenas pagamentos do dia atual.
  */
-async function syncDia(): Promise<void> {
-  // Sincronizar GRUs (últimos 5 dias, um por requisição) - DESATIVADO
-  // try {
-  //   console.log('[sisgruSync] Iniciando sync de GRUs (últimos 5 dias)')
-  //   const resultado = await syncGrusDias()
-  //   console.log(
-  //     `[sisgruSync] GRUs sincronizados: ${resultado.novos} novos / ${resultado.total} total`,
-  //   )
-  //   await registrarLog({
-  //     tipo: 'grus',
-  //     qtdNovos: resultado.novos,
-  //     qtdTotal: resultado.total,
-  //     status: 'sucesso',
-  //   })
-  // } catch (err) {
-  //   const msg = (err as Error).message
-  //   console.error(`[sisgruSync] Erro ao sincronizar GRUs: ${msg}`)
-  //   await registrarLog({
-  //     tipo: 'grus',
-  //     qtdNovos: null,
-  //     qtdTotal: null,
-  //     status: 'erro',
-  //     mensagemErro: msg,
-  //   })
-  // }
-
-  // Sincronizar Pagamentos (últimos 5 dias, um por requisição)
+async function syncPagamentosDiaAtual(): Promise<void> {
   try {
-    console.log('[sisgruSync] Iniciando sync de Pagamentos (últimos 5 dias)')
-    const resultado = await syncPagamentosDias()
+    console.log('[sisgruSync] Iniciando sync de Pagamentos do dia atual')
+    const resultado = await syncPagamentosPorDias([0])
     console.log(
-      `[sisgruSync] Pagamentos sincronizados: ${resultado.novos} novos / ${resultado.total} total`,
+      `[sisgruSync] Pagamentos do dia atual sincronizados: ${resultado.novos} novos / ${resultado.total} total`,
     )
     await registrarLog({
-      tipo: 'pagamentos',
+      tipo: 'pagamentos_hoje',
       qtdNovos: resultado.novos,
       qtdTotal: resultado.total,
       status: 'sucesso',
     })
   } catch (err) {
     const msg = (err as Error).message
-    console.error(`[sisgruSync] Erro ao sincronizar Pagamentos: ${msg}`)
+    console.error(`[sisgruSync] Erro ao sincronizar Pagamentos do dia atual: ${msg}`)
     await registrarLog({
-      tipo: 'pagamentos',
+      tipo: 'pagamentos_hoje',
       qtdNovos: null,
       qtdTotal: null,
       status: 'erro',
@@ -439,4 +417,47 @@ async function syncDia(): Promise<void> {
   }
 }
 
-export { syncGrus, syncPagamentos, syncDia }
+/**
+ * Sincroniza pagamentos dos 5 dias anteriores ao dia atual (D-1 a D-5), um dia por requisição.
+ */
+async function syncPagamentosUltimos5DiasAnteriores(): Promise<void> {
+  try {
+    console.log('[sisgruSync] Iniciando sync de Pagamentos dos 5 dias anteriores')
+    const resultado = await syncPagamentosPorDias([5, 4, 3, 2, 1])
+    console.log(
+      `[sisgruSync] Pagamentos dos 5 dias anteriores sincronizados: ${resultado.novos} novos / ${resultado.total} total`,
+    )
+    await registrarLog({
+      tipo: 'pagamentos_anteriores_5d',
+      qtdNovos: resultado.novos,
+      qtdTotal: resultado.total,
+      status: 'sucesso',
+    })
+  } catch (err) {
+    const msg = (err as Error).message
+    console.error(`[sisgruSync] Erro ao sincronizar Pagamentos dos 5 dias anteriores: ${msg}`)
+    await registrarLog({
+      tipo: 'pagamentos_anteriores_5d',
+      qtdNovos: null,
+      qtdTotal: null,
+      status: 'erro',
+      mensagemErro: msg,
+    })
+  }
+}
+
+/**
+ * Sincronização manual completa de pagamentos: hoje + 5 dias anteriores.
+ */
+async function syncDia(): Promise<void> {
+  await syncPagamentosDiaAtual()
+  await syncPagamentosUltimos5DiasAnteriores()
+}
+
+export {
+  syncGrus,
+  syncPagamentos,
+  syncDia,
+  syncPagamentosDiaAtual,
+  syncPagamentosUltimos5DiasAnteriores,
+}
