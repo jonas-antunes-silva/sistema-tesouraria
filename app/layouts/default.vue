@@ -72,6 +72,14 @@
                   Relatórios
                 </summary>
                 <ul>
+                  <li v-if="auth.hasPermission('tesoureiro') || auth.hasPermission('admin') || auth.hasPermission('tesoureiro.pagamentos')">
+                    <NuxtLink to="/relatorios/pagamentos" class="flex items-center gap-2">
+                      <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                      Pagamentos
+                    </NuxtLink>
+                  </li>
                   <li v-if="auth.hasPermission('tesoureiro') || auth.hasPermission('admin')">
                     <NuxtLink to="/relatorios/tickets" class="flex items-center gap-2">
                       <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
