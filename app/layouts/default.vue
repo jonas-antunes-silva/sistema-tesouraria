@@ -62,6 +62,36 @@
                 Ticket Refeição
               </NuxtLink>
             </li>
+            <li v-if="auth.hasPermission('tesoureiro') || auth.hasPermission('admin') || auth.hasPermission('reprografia')">
+              <details>
+                <summary class="flex items-center gap-2">
+                  <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3h6l4 4v13a1 1 0 01-1 1H9a2 2 0 01-2-2V4a1 1 0 011-1z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 3v4h4M10 12h6M10 16h6" />
+                  </svg>
+                  Relatórios
+                </summary>
+                <ul>
+                  <li v-if="auth.hasPermission('tesoureiro') || auth.hasPermission('admin')">
+                    <NuxtLink to="/relatorios/tickets" class="flex items-center gap-2">
+                      <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 00-2 2 2 2 0 002 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2a2 2 0 002-2 2 2 0 00-2-2V9z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 8v8" stroke-dasharray="2 2" />
+                      </svg>
+                      Baixas de Tickets
+                    </NuxtLink>
+                  </li>
+                  <li v-if="auth.hasPermission('reprografia') || auth.hasPermission('admin')">
+                    <NuxtLink to="/relatorios/reprografia" class="flex items-center gap-2">
+                      <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                      </svg>
+                      Baixas de Impressões
+                    </NuxtLink>
+                  </li>
+                </ul>
+              </details>
+            </li>
             <li v-if="auth.hasPermission('admin')">
               <details>
                 <summary class="flex items-center gap-2">

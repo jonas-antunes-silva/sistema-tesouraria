@@ -21,7 +21,7 @@
 
         <tr v-for="u in usos" :key="u.id">
           <td class="whitespace-nowrap">{{ formatarDataHora(u.registrado_em) }}</td>
-          <td class="font-mono text-xs">{{ mascaraCpf(u.cpf) }}</td>
+          <td class="font-mono text-xs">{{ formatarCpf(u.cpf) }}</td>
           <td>{{ u.nome }}</td>
           <td>{{ u.num_copias }}</td>
           <td class="text-right">{{ formatarMoeda(u.valor_total) }}</td>
@@ -50,7 +50,7 @@
 
       <div v-if="usoEstorno" class="py-4 space-y-2">
         <p class="text-sm">Nome: <strong>{{ usoEstorno.nome }}</strong></p>
-        <p class="text-sm">CPF: <strong>{{ mascaraCpf(usoEstorno.cpf) }}</strong></p>
+        <p class="text-sm">CPF: <strong>{{ formatarCpf(usoEstorno.cpf) }}</strong></p>
         <p class="text-sm">Valor da baixa: <strong>{{ formatarMoeda(usoEstorno.valor_total) }}</strong></p>
 
         <div class="form-control mt-3">
@@ -118,10 +118,10 @@ function formatarMoeda(valor: number): string {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
-function mascaraCpf(cpf: string): string {
+function formatarCpf(cpf: string): string {
   const digits = cpf.replace(/\D/g, '')
   if (digits.length !== 11) return cpf
-  return `***.${digits.slice(3, 6)}.${digits.slice(6, 9)}-**`
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9, 11)}`
 }
 
 function formatarDataHora(d: string): string {
