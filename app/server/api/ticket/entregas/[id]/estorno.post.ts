@@ -2,6 +2,7 @@ import { createError, defineEventHandler, getRouterParam, readBody } from 'h3'
 import { z } from 'zod'
 import { pool } from '../../../../utils/db'
 import { checkPermission } from '../../../../utils/rbac'
+import { registrarLancamentoLivroCaixa } from '../../../../utils/livroCaixa'
 
 const bodySchema = z.object({
   motivo: z.string().trim().min(3, 'Motivo do estorno é obrigatório').max(500),
@@ -53,10 +54,12 @@ export default defineEventHandler(async (event) => {
     const entregaResult = await client.query<{
       id: number
       cpf: string
+      nome: string
+      valor_consumido: string
       criado_em: string
       estornado: boolean
     }>(
-      `SELECT id, cpf, criado_em, estornado
+      `SELECT id, cpf, nome, valor_consumido::text, criado_em, estornado
        FROM ticket_entregas
        WHERE id = $1
        FOR UPDATE`,
@@ -115,6 +118,20 @@ export default defineEventHandler(async (event) => {
        WHERE id = $3`,
       [userId, parsed.data.motivo, entregaId],
     )
+
+    await registrarLancamentoLivroCaixa(client, {
+      modulo: 'ticket',
+      cpf: entrega.cpf,
+      nome: entrega.nome,
+      tipo: 'credito',
+      valor: Number(entrega.valor_consumido),
+      origem: 'ticket_estorno',
+      origemId: String(entregaId),
+      chaveIdempotencia: `ticket:entrega_estorno:${entregaId}`,
+      metadata: {
+        motivo: parsed.data.motivo,
+      },
+    })
 
     await client.query('COMMIT')
     return { ok: true }

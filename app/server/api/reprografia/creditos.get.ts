@@ -2,6 +2,7 @@ import { defineEventHandler, getQuery, createError } from 'h3'
 import { z } from 'zod'
 import { query } from '../../utils/db'
 import { requirePermission } from '../../utils/rbac'
+import { obterResumoLivroCaixa } from '../../utils/livroCaixa'
 
 const schema = z.object({
   cpf: z
@@ -27,32 +28,29 @@ export default defineEventHandler(async (event) => {
   const cpfDigits = parsed.data.cpf
 
   try {
-    const result = await query<{
-      cpf: string
-      nome: string
-      saldo: string | number
-      atualizado_em: string
-    }>(
-      `SELECT cpf, nome, saldo, atualizado_em
-       FROM reprografia_creditos
-       WHERE regexp_replace(cpf, '\\D', '', 'g') = $1
-       LIMIT 1`,
-      [cpfDigits],
-    )
-
-    const row = result.rows[0]
-    if (!row) {
+    const resumo = await obterResumoLivroCaixa({ query }, 'reprografia', cpfDigits)
+    if (resumo.creditos <= 0) {
       throw createError({
         statusCode: 422,
         statusMessage: 'CPF não possui créditos cadastrados',
       })
     }
 
+    const nomeResult = await query<{ nome: string | null }>(
+      `SELECT MAX(NULLIF(btrim(nome), '')) AS nome
+       FROM financeiro_lancamentos
+       WHERE modulo = 'reprografia'
+         AND regexp_replace(cpf, '\\D', '', 'g') = $1`,
+      [cpfDigits],
+    )
+
+    const nome = nomeResult.rows[0]?.nome?.trim() || 'Nao informado'
+
     return {
-      cpf: row.cpf,
-      nome: row.nome,
-      saldo: Number(row.saldo),
-      atualizado_em: row.atualizado_em,
+      cpf: cpfDigits,
+      nome,
+      saldo: resumo.saldo,
+      atualizado_em: new Date().toISOString(),
     }
   } catch (err: unknown) {
     // Não mascarar erros HTTP (ex.: 400/401/403/422) gerados pelo próprio handler.

@@ -2,6 +2,12 @@ import { createError, defineEventHandler, getRouterParam, readBody } from 'h3'
 import { z } from 'zod'
 import { pool } from '../../../../utils/db'
 import { requirePermission } from '../../../../utils/rbac'
+import {
+  moduloPorServicoId,
+  obterResumoLivroCaixa,
+  registrarLancamentoLivroCaixa,
+  travarContaLivroCaixa,
+} from '../../../../utils/livroCaixa'
 
 const bodySchema = z.object({
   novo_servico_id: z.number().int().positive('Serviço inválido'),
@@ -107,31 +113,20 @@ export default defineEventHandler(async (event) => {
 
     const cpf = pagamento.codigo_contribuinte
     const cpfDigits = cpf.replace(/\D/g, '')
+    const moduloAnterior = moduloPorServicoId(servicoIdAnterior)
+    const moduloNovo = moduloPorServicoId(novoServicoId)
 
     // Se sair de impressão, estorna o crédito local da reprografia.
-    if (servicoIdAnterior === 16279 && novoServicoId !== 16279) {
-      const saldoReproResult = await client.query<{ saldo: string }>(
-        `SELECT saldo::text
-         FROM reprografia_creditos
-         WHERE regexp_replace(cpf, '\\D', '', 'g') = $1
-         FOR UPDATE`,
-        [cpfDigits],
-      )
-      const saldoAtual = toNumber(saldoReproResult.rows[0]?.saldo ?? '0')
+    if (moduloAnterior === 'reprografia' && moduloNovo !== 'reprografia') {
+      await travarContaLivroCaixa(client, 'reprografia', cpfDigits)
+      const resumoRepro = await obterResumoLivroCaixa(client, 'reprografia', cpfDigits)
+      const saldoAtual = resumoRepro.saldo
       if (saldoAtual < valorPagamento) {
         throw createError({
           statusCode: 422,
           statusMessage: 'Retificação bloqueada: crédito de impressão já utilizado',
         })
       }
-
-      await client.query(
-        `UPDATE reprografia_creditos
-         SET saldo = saldo - $1::numeric,
-             atualizado_em = NOW()
-         WHERE regexp_replace(cpf, '\\D', '', 'g') = $2`,
-        [valorPagamento.toFixed(2), cpfDigits],
-      )
     }
 
     // Se sair de ticket, bloqueia somente se este pagamento já tiver consumo FIFO.
@@ -157,7 +152,7 @@ export default defineEventHandler(async (event) => {
              ) AS acumulado_ate_atual
            FROM sisgru_pagamentos sp
            WHERE regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $1
-             AND sp.situacao = 'CO'
+             AND sp.situacao IN ('CO', 'CG')
              AND COALESCE(sp.servico_id_retificado, sp.servico_id) = 14671
          ),
          alvo AS (
@@ -189,19 +184,6 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Se entrar em impressão, soma crédito local da reprografia.
-    if (servicoIdAnterior !== 16279 && novoServicoId === 16279) {
-      await client.query(
-        `INSERT INTO reprografia_creditos (cpf, nome, saldo)
-         VALUES ($1, $2, $3)
-         ON CONFLICT (cpf) DO UPDATE
-           SET saldo = reprografia_creditos.saldo + EXCLUDED.saldo,
-               nome = EXCLUDED.nome,
-               atualizado_em = NOW()`,
-        [cpfDigits, pagamento.nome_contribuinte.trim(), valorPagamento.toFixed(2)],
-      )
-    }
-
     await client.query(
       `UPDATE sisgru_pagamentos
        SET servico_id_retificado = $1,
@@ -213,7 +195,7 @@ export default defineEventHandler(async (event) => {
       [novoServicoId, novoServicoNome, userId, pagamentoId],
     )
 
-    await client.query(
+    const retificacaoResult = await client.query<{ id: number }>(
       `INSERT INTO sisgru_pagamentos_retificacoes (
          pagamento_id,
          servico_id_anterior,
@@ -221,7 +203,8 @@ export default defineEventHandler(async (event) => {
          servico_id_novo,
          servico_nome_novo,
          retificado_por
-       ) VALUES ($1, $2, $3, $4, $5, $6)`,
+       ) VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id`,
       [
         pagamentoId,
         servicoIdAnterior,
@@ -231,6 +214,49 @@ export default defineEventHandler(async (event) => {
         userId,
       ],
     )
+
+    const retificacaoId = retificacaoResult.rows[0]?.id
+    if (!retificacaoId) {
+      throw createError({ statusCode: 500, statusMessage: 'Falha ao registrar retificação' })
+    }
+
+    if (valorPagamento > 0 && pagamento.situacao === 'CO' && moduloAnterior !== moduloNovo) {
+      if (moduloAnterior) {
+        await registrarLancamentoLivroCaixa(client, {
+          modulo: moduloAnterior,
+          cpf: cpfDigits,
+          nome: pagamento.nome_contribuinte,
+          tipo: 'debito',
+          valor: valorPagamento,
+          origem: 'retificacao_pagamento',
+          origemId: String(retificacaoId),
+          chaveIdempotencia: `${moduloAnterior}:retificacao_saida:${retificacaoId}`,
+          metadata: {
+            pagamento_id: pagamentoId,
+            servico_id_anterior: servicoIdAnterior,
+            servico_id_novo: novoServicoId,
+          },
+        })
+      }
+
+      if (moduloNovo) {
+        await registrarLancamentoLivroCaixa(client, {
+          modulo: moduloNovo,
+          cpf: cpfDigits,
+          nome: pagamento.nome_contribuinte,
+          tipo: 'credito',
+          valor: valorPagamento,
+          origem: 'retificacao_pagamento',
+          origemId: String(retificacaoId),
+          chaveIdempotencia: `${moduloNovo}:retificacao_entrada:${retificacaoId}`,
+          metadata: {
+            pagamento_id: pagamentoId,
+            servico_id_anterior: servicoIdAnterior,
+            servico_id_novo: novoServicoId,
+          },
+        })
+      }
+    }
 
     await client.query('COMMIT')
     return { ok: true }

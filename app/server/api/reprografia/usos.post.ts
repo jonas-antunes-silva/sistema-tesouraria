@@ -2,6 +2,11 @@ import { defineEventHandler, readBody, createError } from 'h3'
 import { z } from 'zod'
 import { pool } from '../../utils/db'
 import { requirePermission } from '../../utils/rbac'
+import {
+  obterResumoLivroCaixa,
+  registrarLancamentoLivroCaixa,
+  travarContaLivroCaixa,
+} from '../../utils/livroCaixa'
 
 const schema = z.object({
   cpf: z
@@ -60,29 +65,26 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 500, statusMessage: 'Valor por cópia inválido' })
     }
 
-    // Bloqueia a linha do crédito para garantir atomicidade do saldo
-    const credito = await client.query<{
-      cpf: string
-      nome: string
-      saldo: string
-    }>(
-      `SELECT cpf, nome, saldo
-       FROM reprografia_creditos
-       WHERE regexp_replace(cpf, '\\D', '', 'g') = $1
-       LIMIT 1
-       FOR UPDATE`,
-      [cpfDigits],
-    )
+    await travarContaLivroCaixa(client, 'reprografia', cpfDigits)
 
-    const creditoRow = credito.rows[0]
-    if (!creditoRow) {
+    const resumo = await obterResumoLivroCaixa(client, 'reprografia', cpfDigits)
+    if (resumo.creditos <= 0) {
       throw createError({
         statusCode: 422,
         statusMessage: 'CPF não possui créditos cadastrados',
       })
     }
 
-    const saldoAnterior = Number(creditoRow.saldo)
+    const nomeResult = await client.query<{ nome: string | null }>(
+      `SELECT MAX(NULLIF(btrim(nome), '')) AS nome
+       FROM financeiro_lancamentos
+       WHERE modulo = 'reprografia'
+         AND regexp_replace(cpf, '\\D', '', 'g') = $1`,
+      [cpfDigits],
+    )
+
+    const nomeContribuinte = nomeResult.rows[0]?.nome?.trim() || 'Nao informado'
+    const saldoAnterior = resumo.saldo
     const valorTotal = valorPorCopia * numCopias
 
     if (saldoAnterior < valorTotal) {
@@ -116,8 +118,8 @@ export default defineEventHandler(async (event) => {
        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
       [
-        creditoRow.cpf,
-        creditoRow.nome,
+        cpfDigits,
+        nomeContribuinte,
         numCopias,
         valorPorCopia.toFixed(4),
         valorTotalStr,
@@ -127,18 +129,23 @@ export default defineEventHandler(async (event) => {
       ],
     )
 
-    // Debitar saldo
-    await client.query(
-      `UPDATE reprografia_creditos
-       SET saldo = saldo - $1::numeric,
-           atualizado_em = NOW()
-       WHERE cpf = $2`,
-      [valorTotalStr, creditoRow.cpf],
-    )
+    const usoRow = usoResult.rows[0]
+    await registrarLancamentoLivroCaixa(client, {
+      modulo: 'reprografia',
+      cpf: cpfDigits,
+      nome: nomeContribuinte,
+      tipo: 'debito',
+      valor: Number(valorTotalStr),
+      origem: 'reprografia_uso',
+      origemId: String(usoRow.id),
+      chaveIdempotencia: `reprografia:uso:${usoRow.id}`,
+      metadata: {
+        num_copias: numCopias,
+      },
+    })
 
     await client.query('COMMIT')
 
-    const usoRow = usoResult.rows[0]
     return {
       ...usoRow,
       valor_por_copia: Number(usoRow.valor_por_copia),

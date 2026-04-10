@@ -2,6 +2,11 @@ import { defineEventHandler, readBody, createError } from 'h3'
 import { z } from 'zod'
 import { checkPermission } from '../../utils/rbac'
 import { transaction } from '../../utils/db'
+import {
+  obterResumoLivroCaixa,
+  registrarLancamentoLivroCaixa,
+  travarContaLivroCaixa,
+} from '../../utils/livroCaixa'
 
 const BodySchema = z.object({
   cpf: z.string().regex(/^\d{11}$/, 'CPF deve ter 11 dígitos'),
@@ -68,27 +73,11 @@ export default defineEventHandler(async (event) => {
         throw createError({ statusCode: 404, statusMessage: 'CPF sem pagamentos de ticket' })
       }
 
-      const creditosResult = await client.query<{ total: string }>(
-        `SELECT COALESCE(SUM(sp.valor_total), 0)::text AS total
-         FROM sisgru_pagamentos sp
-         WHERE regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $1
-           AND COALESCE(sp.servico_id_retificado, sp.servico_id) = 14671
-           AND sp.situacao = 'CO'`,
-        [parsed.data.cpf],
-      )
-
-      const consumidoResult = await client.query<{ total: string }>(
-        `SELECT COALESCE(SUM(te.valor_consumido), 0)::text AS total
-         FROM ticket_entregas te
-         WHERE regexp_replace(te.cpf, '\\D', '', 'g') = $1
-           AND te.estornado = false`,
-        [parsed.data.cpf],
-      )
+      await travarContaLivroCaixa(client, 'ticket', parsed.data.cpf)
 
       const valorUnitario = Number(precoResult.rows[0].valor)
-      const totalCreditos = Number(creditosResult.rows[0]?.total ?? 0)
-      const totalConsumido = Number(consumidoResult.rows[0]?.total ?? 0)
-      const saldoAntes = Math.max(0, totalCreditos - totalConsumido)
+      const resumo = await obterResumoLivroCaixa(client, 'ticket', parsed.data.cpf)
+      const saldoAntes = resumo.saldo
       const valorConsumido = Number((parsed.data.quantidade * valorUnitario).toFixed(2))
 
       if (valorConsumido > saldoAntes) {
@@ -100,13 +89,14 @@ export default defineEventHandler(async (event) => {
 
       const saldoDepois = Number((saldoAntes - valorConsumido).toFixed(2))
 
-      await client.query(
+      const entregaResult = await client.query<{ id: number }>(
         `INSERT INTO ticket_entregas (
            cpf, nome, tipo, quantidade,
            valor_unitario, valor_consumido,
            saldo_antes, saldo_depois,
            responsavel_id
-         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+         ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+         RETURNING id`,
         [
           parsed.data.cpf,
           nomeContribuinte,
@@ -119,6 +109,26 @@ export default defineEventHandler(async (event) => {
           userId,
         ],
       )
+
+      const entregaId = entregaResult.rows[0]?.id
+      if (!entregaId) {
+        throw createError({ statusCode: 500, statusMessage: 'Falha ao registrar entrega' })
+      }
+
+      await registrarLancamentoLivroCaixa(client, {
+        modulo: 'ticket',
+        cpf: parsed.data.cpf,
+        nome: nomeContribuinte,
+        tipo: 'debito',
+        valor: valorConsumido,
+        origem: 'ticket_entrega',
+        origemId: String(entregaId),
+        chaveIdempotencia: `ticket:entrega:${entregaId}`,
+        metadata: {
+          tipo: parsed.data.tipo,
+          quantidade: parsed.data.quantidade,
+        },
+      })
 
       return {
         quantidade: parsed.data.quantidade,

@@ -1,6 +1,7 @@
 import { defineEventHandler, getQuery, createError } from 'h3'
 import { z } from 'zod'
 import { query } from '../../utils/db'
+import { obterResumoLivroCaixa } from '../../utils/livroCaixa'
 
 const schema = z.object({
   cpf: z.string().regex(/^\d{11}$/, 'CPF deve ter 11 dígitos'),
@@ -31,31 +32,15 @@ export default defineEventHandler(async (event) => {
        FROM sisgru_pagamentos sp
        WHERE regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $1
          AND COALESCE(sp.servico_id_retificado, sp.servico_id) = 14671
-         AND sp.situacao = 'CO'
+         AND sp.situacao IN ('CO', 'CG')
        ORDER BY sp.data DESC`,
       [parsed.data.cpf],
     )
 
-    const totalCreditosResult = await query<{ total: string }>(
-      `SELECT COALESCE(SUM(sp.valor_total), 0)::text AS total
-       FROM sisgru_pagamentos sp
-       WHERE regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $1
-         AND COALESCE(sp.servico_id_retificado, sp.servico_id) = 14671
-         AND sp.situacao = 'CO'`,
-      [parsed.data.cpf],
-    )
-
-    const totalConsumidoResult = await query<{ total: string }>(
-      `SELECT COALESCE(SUM(te.valor_consumido), 0)::text AS total
-       FROM ticket_entregas te
-       WHERE regexp_replace(te.cpf, '\\D', '', 'g') = $1
-         AND te.estornado = false`,
-      [parsed.data.cpf],
-    )
-
-    const totalCreditos = Number(totalCreditosResult.rows[0]?.total ?? 0)
-    const totalConsumido = Number(totalConsumidoResult.rows[0]?.total ?? 0)
-    const saldoDisponivel = Math.max(0, totalCreditos - totalConsumido)
+    const resumo = await obterResumoLivroCaixa({ query }, 'ticket', parsed.data.cpf)
+    const totalCreditos = resumo.creditos
+    const totalConsumido = resumo.debitos
+    const saldoDisponivel = resumo.saldo
 
     return {
       cpf: parsed.data.cpf,

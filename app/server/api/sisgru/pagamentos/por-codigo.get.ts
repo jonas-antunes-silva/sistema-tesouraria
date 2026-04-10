@@ -1,14 +1,12 @@
 import { defineEventHandler, getQuery, createError } from 'h3'
 import { z } from 'zod'
-import { query } from '../../utils/db'
+import { query } from '../../../utils/db'
 
-// Requisitos: 10.2, 12.2, 12.6
 const schema = z.object({
-  data: z.string().regex(/^\d{2}\/\d{2}\/\d{4}$/, 'Formato inválido: DD/MM/YYYY'),
+  codigo: z.string().trim().min(1, 'Código de pagamento obrigatório').max(60, 'Código inválido'),
 })
 
 export default defineEventHandler(async (event) => {
-  // Middleware auth garante event.context.userId
   const params = getQuery(event)
   const parsed = schema.safeParse(params)
 
@@ -19,10 +17,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Converter DD/MM/YYYY → YYYY-MM-DD para PostgreSQL
-  const [dd, mm, yyyy] = parsed.data.data.split('/')
-  const dataPostgres = `${yyyy}-${mm}-${dd}`
-
   try {
     const result = await query(
       `SELECT sp.id,
@@ -32,29 +26,36 @@ export default defineEventHandler(async (event) => {
               sp.numero_referencia,
               COALESCE(sp.servico_id_retificado, sp.servico_id) AS servico_id,
               COALESCE(sp.servico_nome_retificado, sp.servico_nome) AS servico_nome,
-              sp.retificado,
-              sp.retificado_em,
-              sp.valor_total,
               sp.situacao,
+              sp.valor_total,
               sp.tipo_pagamento_nome,
               sp.data,
-              sp.data_alteracao_situacao_pag_tesouro,
               sp.data_pagamento_psp,
+              sp.data_alteracao_situacao_pag_tesouro,
               sp.dt_criacao,
               sp.sincronizado_em
        FROM sisgru_pagamentos sp
-       WHERE DATE(sp.data) = $1::date
-        ORDER BY sp.data DESC NULLS LAST, sp.id DESC`,
-      [dataPostgres],
+       WHERE sp.codigo = $1
+       ORDER BY sp.sincronizado_em DESC
+       LIMIT 1`,
+      [parsed.data.codigo],
     )
-    return result.rows.map((row) => ({
+
+    if (result.rows.length === 0) {
+      throw createError({ statusCode: 404, statusMessage: 'Pagamento não encontrado' })
+    }
+
+    const row = result.rows[0] as Record<string, unknown>
+
+    return {
       ...row,
       id: Number(row.id),
       numero_referencia: row.numero_referencia == null ? null : Number(row.numero_referencia),
       servico_id: Number(row.servico_id),
       valor_total: Number(row.valor_total),
-    }))
-  } catch {
+    }
+  } catch (err: unknown) {
+    if (err && typeof err === 'object' && 'statusCode' in err) throw err
     throw createError({ statusCode: 500, statusMessage: 'Erro interno' })
   }
 })

@@ -85,6 +85,22 @@
     <div class="card bg-base-100 shadow-sm mt-4">
       <div class="card-body p-4">
         <h2 class="card-title text-lg">Histórico de Sincronizações</h2>
+        <div class="tabs tabs-boxed w-fit mb-3">
+          <button
+            class="tab"
+            :class="abaHistorico === 'todas' ? 'tab-active' : ''"
+            @click="abaHistorico = 'todas'"
+          >
+            Todas
+          </button>
+          <button
+            class="tab"
+            :class="abaHistorico === 'd1d5' ? 'tab-active' : ''"
+            @click="abaHistorico = 'd1d5'"
+          >
+            D-1 a D-5
+          </button>
+        </div>
         <div class="overflow-x-auto">
           <table class="table table-sm">
             <thead>
@@ -98,12 +114,12 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-if="historico.length === 0">
+              <tr v-if="historicoFiltrado.length === 0">
                 <td colspan="6" class="text-center text-base-content/60">
-                  Nenhuma sincronização registrada
+                  Nenhuma sincronização registrada nesta aba
                 </td>
               </tr>
-              <tr v-for="log in historico" :key="log.id">
+              <tr v-for="log in historicoFiltrado" :key="log.id">
                 <td>{{ formatarData(log.finalizado_em) }}</td>
                 <td class="capitalize">{{ log.tipo }}</td>
                 <td>{{ log.qtd_total ?? '—' }}</td>
@@ -148,8 +164,18 @@ const erro = ref<string | null>(null)
 const sincronizando = ref(false)
 const dataAlvo = ref<string>('')
 const historico = ref<SyncLog[]>([])
+const abaHistorico = ref<'todas' | 'd1d5'>('todas')
 const resultado = ref<SyncLog[] | null>(null)
 const resultadoMensagem = ref<string>('')
+
+const historicoFiltrado = computed<SyncLog[]>(() => {
+  if (abaHistorico.value === 'd1d5') {
+    return historico.value.filter(
+      (log) => log.tipo === 'pagamentos_anteriores_5d' || log.tipo === 'pagamentos',
+    )
+  }
+  return historico.value
+})
 
 function formatarData(data: string): string {
   const dt = new Date(data)
@@ -172,6 +198,19 @@ async function carregarHistorico() {
   }
 }
 
+function montarResultado(): SyncLog[] {
+  const tiposDesejados = [
+    'grus_manual_data',
+    'pagamentos_manual_data',
+    'grus_ultimos_5d',
+    'pagamentos_hoje',
+    'pagamentos_anteriores_5d',
+  ]
+  return tiposDesejados
+    .map((tipo) => historico.value.find((log) => log.tipo === tipo))
+    .filter((log): log is SyncLog => Boolean(log))
+}
+
 async function sincronizar() {
   sincronizando.value = true
   erro.value = null
@@ -185,7 +224,7 @@ async function sincronizar() {
     })
     resultadoMensagem.value = 'Sincronização iniciada. Atualizando histórico...'
     await carregarHistorico()
-    resultado.value = historico.value.slice(0, 2)
+    resultado.value = montarResultado()
     resultadoMensagem.value = 'Sincronização concluída.'
   } catch (err: unknown) {
     const msg =

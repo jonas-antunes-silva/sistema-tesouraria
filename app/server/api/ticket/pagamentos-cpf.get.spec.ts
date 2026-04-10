@@ -37,7 +37,7 @@ describe('ticket/pagamentos-cpf.get', () => {
     })
   })
 
-  it('calcula saldo apenas com creditos e ticket_entregas', async () => {
+  it('calcula saldo com base no livro-caixa de ticket', async () => {
     getQueryMock.mockReturnValue({ cpf: '12345678901' })
 
     queryMock
@@ -53,8 +53,7 @@ describe('ticket/pagamentos-cpf.get', () => {
           },
         ],
       })
-      .mockResolvedValueOnce({ rows: [{ total: '100.00' }] })
-      .mockResolvedValueOnce({ rows: [{ total: '30.00' }] })
+      .mockResolvedValueOnce({ rows: [{ creditos: '100.00', debitos: '30.00' }] })
 
     const result = await handler({} as never)
 
@@ -73,6 +72,7 @@ describe('ticket/pagamentos-cpf.get', () => {
     })
 
     const sqlCalls = queryMock.mock.calls.map((call) => String(call[0]).toLowerCase())
+    expect(sqlCalls.some((sql) => sql.includes('financeiro_lancamentos'))).toBe(true)
     expect(sqlCalls.some((sql) => sql.includes('ticket_retirado'))).toBe(false)
     expect(sqlCalls.some((sql) => sql.includes('ticket_transacao'))).toBe(false)
   })

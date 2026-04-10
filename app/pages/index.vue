@@ -5,7 +5,7 @@
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <NuxtLink
-        v-if="auth.hasPermission('tesoureiro')"
+        v-if="auth.hasPermission('tesoureiro') || auth.hasPermission('admin')"
         to="/grus"
         class="card bg-base-100 shadow hover:shadow-md transition-shadow cursor-pointer"
       >

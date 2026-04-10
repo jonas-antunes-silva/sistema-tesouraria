@@ -1,6 +1,10 @@
 import cron from 'node-cron'
 import { verificarChavePrivada } from '../utils/sisgruJwt'
-import { syncPagamentosDiaAtual, syncPagamentosUltimos5DiasAnteriores } from '../services/sisgruSync'
+import {
+  syncGrusUltimos5Dias,
+  syncPagamentosDiaAtual,
+  syncPagamentosUltimos5DiasAnteriores,
+} from '../services/sisgruSync'
 
 export default defineNitroPlugin(() => {
   // Verificar chave privada na inicialização
@@ -14,8 +18,11 @@ export default defineNitroPlugin(() => {
 
   let executandoHoje = false
   let executandoAnteriores = false
+  let executandoGrus = false
 
-  console.log('[sisgruCron] Agendamentos SISGRU ativos: hoje a cada 1 min; D-1..D-5 a cada 20 min.')
+  console.log(
+    '[sisgruCron] Agendamentos SISGRU ativos: pagamentos hoje a cada 1 min; pagamentos D-1..D-5 a cada 5 min; GRUs últimos 5 dias a cada 10 min.',
+  )
 
   cron.schedule('* * * * *', async () => {
     if (executandoHoje) {
@@ -33,7 +40,7 @@ export default defineNitroPlugin(() => {
     }
   })
 
-  cron.schedule('*/20 * * * *', async () => {
+  cron.schedule('*/5 * * * *', async () => {
     if (executandoAnteriores) {
       console.log('[sisgruCron] Sync D-1..D-5 ignorada: execução anterior ainda em andamento.')
       return
@@ -46,6 +53,22 @@ export default defineNitroPlugin(() => {
       console.error(`[sisgruCron] Erro inesperado no sync D-1..D-5: ${(err as Error).message}`)
     } finally {
       executandoAnteriores = false
+    }
+  })
+
+  cron.schedule('*/10 * * * *', async () => {
+    if (executandoGrus) {
+      console.log('[sisgruCron] Sync GRUs ignorada: execução anterior ainda em andamento.')
+      return
+    }
+
+    executandoGrus = true
+    try {
+      await syncGrusUltimos5Dias()
+    } catch (err) {
+      console.error(`[sisgruCron] Erro inesperado no sync de GRUs: ${(err as Error).message}`)
+    } finally {
+      executandoGrus = false
     }
   })
 })

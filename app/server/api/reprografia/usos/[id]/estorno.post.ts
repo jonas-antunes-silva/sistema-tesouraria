@@ -2,6 +2,7 @@ import { createError, defineEventHandler, getRouterParam, readBody } from 'h3'
 import { z } from 'zod'
 import { pool } from '../../../../utils/db'
 import { requirePermission } from '../../../../utils/rbac'
+import { registrarLancamentoLivroCaixa, travarContaLivroCaixa } from '../../../../utils/livroCaixa'
 
 const bodySchema = z.object({
   motivo: z.string().trim().min(3, 'Motivo do estorno é obrigatório').max(500),
@@ -43,11 +44,12 @@ export default defineEventHandler(async (event) => {
     const usoResult = await client.query<{
       id: number
       cpf: string
+      nome: string
       valor_total: string
       registrado_em: string
       estornado: boolean
     }>(
-      `SELECT id, cpf, valor_total::text, registrado_em, estornado
+      `SELECT id, cpf, nome, valor_total::text, registrado_em, estornado
        FROM reprografia_usos
        WHERE id = $1
        FOR UPDATE`,
@@ -97,15 +99,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const creditoResult = await client.query<{ saldo: string }>(
-      `SELECT saldo::text
-       FROM reprografia_creditos
-       WHERE cpf = $1
-       FOR UPDATE`,
-      [uso.cpf],
-    )
-
-    const saldoAtual = toNumber(creditoResult.rows[0]?.saldo ?? '0')
+    await travarContaLivroCaixa(client, 'reprografia', uso.cpf)
     const valorEstorno = toNumber(uso.valor_total)
 
     // Evita inconsistência por valor inválido de origem.
@@ -117,14 +111,6 @@ export default defineEventHandler(async (event) => {
     }
 
     await client.query(
-      `UPDATE reprografia_creditos
-       SET saldo = $1::numeric,
-           atualizado_em = NOW()
-       WHERE cpf = $2`,
-      [(saldoAtual + valorEstorno).toFixed(2), uso.cpf],
-    )
-
-    await client.query(
       `UPDATE reprografia_usos
        SET estornado = true,
            estornado_em = NOW(),
@@ -133,6 +119,20 @@ export default defineEventHandler(async (event) => {
        WHERE id = $3`,
       [userId, parsed.data.motivo, usoId],
     )
+
+    await registrarLancamentoLivroCaixa(client, {
+      modulo: 'reprografia',
+      cpf: uso.cpf,
+      nome: uso.nome,
+      tipo: 'credito',
+      valor: valorEstorno,
+      origem: 'reprografia_estorno',
+      origemId: String(usoId),
+      chaveIdempotencia: `reprografia:uso_estorno:${usoId}`,
+      metadata: {
+        motivo: parsed.data.motivo,
+      },
+    })
 
     await client.query('COMMIT')
     return { ok: true }

@@ -61,9 +61,10 @@ describe('ticket/entrega.post', () => {
       .fn()
       .mockResolvedValueOnce({ rows: [{ valor: '18.50' }] })
       .mockResolvedValueOnce({ rows: [{ nome_contribuinte: 'Pessoa Teste' }] })
-      .mockResolvedValueOnce({ rows: [{ total: '100.00' }] })
-      .mockResolvedValueOnce({ rows: [{ total: '20.00' }] })
       .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ creditos: '100.00', debitos: '20.00' }] })
+      .mockResolvedValueOnce({ rows: [{ id: 123 }] })
+      .mockResolvedValueOnce({ rows: [{ id: '1' }], rowCount: 1 })
 
     transactionMock.mockImplementation(async (cb: (client: { query: typeof clientQueryMock }) => Promise<unknown>) =>
       cb({ query: clientQueryMock }),
@@ -95,8 +96,8 @@ describe('ticket/entrega.post', () => {
       .fn()
       .mockResolvedValueOnce({ rows: [{ valor: '20.00' }] })
       .mockResolvedValueOnce({ rows: [{ nome_contribuinte: 'Pessoa Teste' }] })
-      .mockResolvedValueOnce({ rows: [{ total: '30.00' }] })
-      .mockResolvedValueOnce({ rows: [{ total: '0.00' }] })
+      .mockResolvedValueOnce({ rows: [] })
+      .mockResolvedValueOnce({ rows: [{ creditos: '30.00', debitos: '0.00' }] })
 
     transactionMock.mockImplementation(async (cb: (client: { query: typeof clientQueryMock }) => Promise<unknown>) =>
       cb({ query: clientQueryMock }),

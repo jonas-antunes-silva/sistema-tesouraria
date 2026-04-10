@@ -58,7 +58,7 @@
               <div class="flex items-center gap-2">
                 <span>{{ p.servico_nome }}</span>
                 <button
-                  v-if="p.situacao === 'CO'"
+                  v-if="p.situacao === 'CO' || p.situacao === 'CG'"
                   class="btn btn-ghost btn-xs"
                   title="Retificar serviço"
                   @click="abrirRetificacao(p)"
@@ -83,9 +83,10 @@
                 class="badge"
                 :class="{
                   'badge-success text-white': p.situacao === 'CO',
+                  'badge-info text-white': p.situacao === 'CG',
                   'badge-warning text-neutral': p.situacao === 'CA',
                   'badge-error text-white': p.situacao === 'RE',
-                  'badge-neutral': p.situacao !== 'CO' && p.situacao !== 'CA' && p.situacao !== 'RE'
+                  'badge-neutral': p.situacao !== 'CO' && p.situacao !== 'CG' && p.situacao !== 'CA' && p.situacao !== 'RE'
                 }"
               >{{ traducaoSituacao(p.situacao) }}</span>
             </td>
@@ -261,7 +262,7 @@ const pagamentosFiltrados = computed(() =>
 
 const somaTotal = computed(() =>
   pagamentosFiltrados.value
-    .filter((p) => p.situacao === 'CO')
+    .filter((p) => p.situacao === 'CO' || p.situacao === 'CG')
     .reduce((acc, p) => acc + Number(p.valor_total), 0)
 )
 
@@ -417,6 +418,7 @@ function traducaoSituacao(codigo: string): string {
     IN: 'Iniciado',
     SU: 'Submetido',
     CO: 'Concluído',
+    CG: 'GRU',
     ER: 'Erro',
     CA: 'Cancelado',
     RE: 'Rejeitado',
