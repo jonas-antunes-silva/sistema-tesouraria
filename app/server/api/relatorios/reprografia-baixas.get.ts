@@ -4,7 +4,11 @@ import { query } from '../../utils/db'
 import { checkPermission } from '../../utils/rbac'
 
 const schema = z.object({
-  data: z
+  data_inicio: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida: YYYY-MM-DD')
+    .optional(),
+  data_fim: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida: YYYY-MM-DD')
     .optional(),
@@ -13,7 +17,10 @@ const schema = z.object({
     .optional()
     .transform((v) => (v ? v.replace(/\D/g, '') : undefined))
     .refine((v) => (v ? v.length === 11 : true), 'CPF inválido'),
-})
+}).refine(
+  (v) => !v.data_inicio || !v.data_fim || v.data_inicio <= v.data_fim,
+  'Data inicial não pode ser maior que data final',
+)
 
 export default defineEventHandler(async (event) => {
   const userId = event.context.userId as string | undefined
@@ -40,7 +47,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const data = parsed.data.data ?? null
+  const dataInicio = parsed.data.data_inicio ?? null
+  const dataFim = parsed.data.data_fim ?? null
   const cpf = parsed.data.cpf ?? null
 
   try {
@@ -59,10 +67,11 @@ export default defineEventHandler(async (event) => {
               ue.nome AS estornado_por_nome
        FROM reprografia_usos ru
        LEFT JOIN usuarios ue ON ue.id = ru.estornado_por
-       WHERE ($1::date IS NULL OR DATE(ru.registrado_em) = $1::date)
-         AND ($2::text IS NULL OR regexp_replace(ru.cpf, '\\D', '', 'g') = $2)
+       WHERE ($1::date IS NULL OR DATE(ru.registrado_em) >= $1::date)
+         AND ($2::date IS NULL OR DATE(ru.registrado_em) <= $2::date)
+         AND ($3::text IS NULL OR regexp_replace(ru.cpf, '\\D', '', 'g') = $3)
        ORDER BY ru.registrado_em DESC`,
-      [data, cpf],
+      [dataInicio, dataFim, cpf],
     )
 
     return result.rows.map((r) => ({

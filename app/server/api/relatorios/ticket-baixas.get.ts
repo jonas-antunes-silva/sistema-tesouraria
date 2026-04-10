@@ -4,7 +4,11 @@ import { query } from '../../utils/db'
 import { checkPermission } from '../../utils/rbac'
 
 const schema = z.object({
-  data: z
+  data_inicio: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida: YYYY-MM-DD')
+    .optional(),
+  data_fim: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida: YYYY-MM-DD')
     .optional(),
@@ -13,7 +17,10 @@ const schema = z.object({
     .optional()
     .transform((v) => (v ? v.replace(/\D/g, '') : undefined))
     .refine((v) => (v ? v.length === 11 : true), 'CPF inválido'),
-})
+}).refine(
+  (v) => !v.data_inicio || !v.data_fim || v.data_inicio <= v.data_fim,
+  'Data inicial não pode ser maior que data final',
+)
 
 async function hasAnyPermission(userId: string): Promise<boolean> {
   const permissions = ['tesoureiro', 'admin', 'tesoureiro.ticket']
@@ -44,7 +51,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const data = parsed.data.data ?? null
+  const dataInicio = parsed.data.data_inicio ?? null
+  const dataFim = parsed.data.data_fim ?? null
   const cpf = parsed.data.cpf ?? null
 
   try {
@@ -66,10 +74,11 @@ export default defineEventHandler(async (event) => {
        FROM ticket_entregas te
        LEFT JOIN usuarios u ON u.id = te.responsavel_id
        LEFT JOIN usuarios ue ON ue.id = te.estornado_por
-       WHERE ($1::date IS NULL OR DATE(te.criado_em) = $1::date)
-         AND ($2::text IS NULL OR regexp_replace(te.cpf, '\\D', '', 'g') = $2)
+       WHERE ($1::date IS NULL OR DATE(te.criado_em) >= $1::date)
+         AND ($2::date IS NULL OR DATE(te.criado_em) <= $2::date)
+         AND ($3::text IS NULL OR regexp_replace(te.cpf, '\\D', '', 'g') = $3)
        ORDER BY te.criado_em DESC`,
-      [data, cpf],
+      [dataInicio, dataFim, cpf],
     )
 
     return result.rows.map((row) => ({

@@ -4,7 +4,11 @@ import { checkPermission } from '../../utils/rbac'
 import { query } from '../../utils/db'
 
 const schema = z.object({
-  data: z
+  data_inicio: z
+    .string()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida: YYYY-MM-DD')
+    .optional(),
+  data_fim: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, 'Data inválida: YYYY-MM-DD')
     .optional(),
@@ -26,7 +30,10 @@ const schema = z.object({
     }),
   situacao: z.string().trim().min(1).max(32).optional(),
   tipo_pagamento: z.string().trim().min(1).max(120).optional(),
-})
+}).refine(
+  (v) => !v.data_inicio || !v.data_fim || v.data_inicio <= v.data_fim,
+  'Data inicial não pode ser maior que data final',
+)
 
 async function hasAnyPermission(userId: string): Promise<boolean> {
   const permissions = ['tesoureiro', 'admin', 'tesoureiro.pagamentos']
@@ -57,7 +64,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const data = parsed.data.data ?? null
+  const dataInicio = parsed.data.data_inicio ?? null
+  const dataFim = parsed.data.data_fim ?? null
   const cpf = parsed.data.cpf ?? null
   const servicos = parsed.data.servicos ?? null
   const situacao = parsed.data.situacao ?? null
@@ -83,13 +91,14 @@ export default defineEventHandler(async (event) => {
               sp.dt_criacao,
               sp.sincronizado_em
        FROM sisgru_pagamentos sp
-       WHERE ($1::date IS NULL OR DATE(sp.data) = $1::date)
-         AND ($2::text IS NULL OR regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $2)
-         AND ($3::text[] IS NULL OR COALESCE(sp.servico_nome_retificado, sp.servico_nome) = ANY($3::text[]))
-         AND ($4::text IS NULL OR sp.situacao = $4)
-         AND ($5::text IS NULL OR sp.tipo_pagamento_nome = $5)
+       WHERE ($1::date IS NULL OR DATE(sp.data) >= $1::date)
+         AND ($2::date IS NULL OR DATE(sp.data) <= $2::date)
+         AND ($3::text IS NULL OR regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $3)
+         AND ($4::text[] IS NULL OR COALESCE(sp.servico_nome_retificado, sp.servico_nome) = ANY($4::text[]))
+         AND ($5::text IS NULL OR sp.situacao = $5)
+         AND ($6::text IS NULL OR sp.tipo_pagamento_nome = $6)
        ORDER BY sp.data DESC NULLS LAST, sp.id DESC`,
-      [data, cpf, servicos, situacao, tipoPagamento],
+      [dataInicio, dataFim, cpf, servicos, situacao, tipoPagamento],
     )
 
     return result.rows.map((row) => ({

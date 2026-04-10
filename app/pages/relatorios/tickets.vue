@@ -4,12 +4,22 @@
 
     <div class="card bg-base-100 shadow-xl mb-6">
       <div class="card-body">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div class="form-control">
             <label class="label p-0 mb-2">
-              <span class="label-text font-medium">Data</span>
+              <span class="label-text font-medium">Período</span>
             </label>
-            <input v-model="filtroData" type="date" class="input input-bordered" />
+            <VueDatePicker
+              v-model="filtroData"
+              :formats="{ input: 'dd/MM/yyyy'}"
+              :format="formatarValorDatePicker"
+              :range="{ partialRange: false }"
+              :enable-time-picker="false"
+              model-type="yyyy-MM-dd"
+              input-class-name="w-full"
+              auto-apply
+              class="w-full datepicker-input"
+            />
           </div>
 
           <div class="form-control">
@@ -86,6 +96,9 @@
 </template>
 
 <script setup lang="ts">
+import { VueDatePicker } from '@vuepic/vue-datepicker'
+import '@vuepic/vue-datepicker/dist/main.css'
+
 definePageMeta({ layout: 'default', middleware: 'auth' })
 
 interface TicketRow {
@@ -104,7 +117,8 @@ interface TicketRow {
 const rows = ref<TicketRow[]>([])
 const carregando = ref(false)
 const erro = ref<string | null>(null)
-const filtroData = ref(new Date().toISOString().slice(0, 10))
+const hoje = new Date().toISOString().slice(0, 10)
+const filtroData = ref<[string, string] | null>([hoje, hoje])
 const cpfDigits = ref('')
 
 const cpfMascarado = computed(() => formatInputCpf(cpfDigits.value))
@@ -139,6 +153,38 @@ function formatarMoeda(valor: number): string {
   return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 
+function formatarDataVisual(dataIso: string): string {
+  const match = dataIso.match(/^(\d{4})-(\d{2})-(\d{2})$/)
+  if (!match) return dataIso
+  return `${match[3]}/${match[2]}/${match[1]}`
+}
+
+function formatarValorDatePicker(value: string | string[]): string {
+  const formatar = (dataIso: string): string => formatarDataVisual(dataIso)
+
+  if (Array.isArray(value)) {
+    const [inicio, fim] = value
+    const inicioFormatado = inicio ? formatar(inicio) : ''
+    const fimFormatado = fim ? formatar(fim) : ''
+
+    if (inicioFormatado && fimFormatado) return `${inicioFormatado} - ${fimFormatado}`
+    if (inicioFormatado) return inicioFormatado
+    return ''
+  }
+
+  return formatar(value)
+}
+
+function obterPeriodoSelecionado(): { dataInicio?: string; dataFim?: string } {
+  if (!filtroData.value) return {}
+
+  const [inicio, fim] = filtroData.value
+  const dataInicio = inicio ?? ''
+  const dataFim = fim ?? ''
+  if (!dataInicio || !dataFim || dataInicio > dataFim) return {}
+  return { dataInicio, dataFim }
+}
+
 async function buscar(): Promise<void> {
   erro.value = null
 
@@ -147,11 +193,18 @@ async function buscar(): Promise<void> {
     return
   }
 
+  const periodo = obterPeriodoSelecionado()
+  if (!periodo.dataInicio || !periodo.dataFim) {
+    erro.value = 'Selecione um período válido.'
+    return
+  }
+
   carregando.value = true
   try {
     rows.value = await $fetch<TicketRow[]>('/api/relatorios/ticket-baixas', {
       query: {
-        data: filtroData.value || undefined,
+        data_inicio: periodo.dataInicio,
+        data_fim: periodo.dataFim,
         cpf: cpfDigits.value || undefined,
       },
     })
@@ -165,3 +218,20 @@ async function buscar(): Promise<void> {
 
 onMounted(buscar)
 </script>
+
+<style scoped>
+.datepicker-input {
+  width: 100%;
+}
+
+.datepicker-input :deep(.dp__input) {
+  height: 3rem;
+  border-radius: 0.5rem;
+  padding-left: 30px;
+  padding-right: 3rem;
+}
+
+.datepicker-input :deep(.dp__input_icon_pad) {
+  padding-right: 3rem !important;
+}
+</style>
