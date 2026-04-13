@@ -28,14 +28,14 @@
           <td class="text-right">{{ formatarMoeda(u.saldo_posterior) }}</td>
           <td>
             <div v-if="u.estornado" class="text-xs">
-              <span class="badge badge-warning">Estornado</span>
+              <span class="badge badge-warning normal-case text-xs font-medium">Estornado</span>
             </div>
             <button
               v-else-if="isHoje(u.registrado_em)"
-              class="btn btn-error btn-xs"
+              class="btn btn-neutral btn-xs"
               @click="abrirModalEstorno(u)"
             >
-              Estorno
+              Realizar estorno
             </button>
             <span v-else class="text-xs text-base-content/50">—</span>
           </td>
@@ -73,7 +73,7 @@
 
       <div class="modal-action">
         <button class="btn btn-ghost" :disabled="salvandoEstorno" @click="fecharModalEstorno">Cancelar</button>
-        <button class="btn btn-error" :disabled="salvandoEstorno || motivoEstorno.trim().length < 3" @click="confirmarEstorno">
+        <button class="btn btn-neutral" :disabled="salvandoEstorno || motivoEstorno.trim().length < 3" @click="confirmarEstorno">
           <span v-if="salvandoEstorno" class="loading loading-spinner loading-sm"></span>
           Confirmar Estorno
         </button>

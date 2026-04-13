@@ -9,17 +9,27 @@
     <div class="card bg-base-100 shadow-xl mb-6">
       <div class="card-body">
         <div class="flex items-end gap-4 flex-wrap">
+          <div class="w-28">
+            <label class="label p-0 mb-2">
+              <span class="label-text font-medium">Tipo</span>
+            </label>
+            <select v-model="tipoDocumento" class="select select-bordered w-full" @change="onTipoDocumentoChange">
+              <option value="cpf">CPF</option>
+              <option value="cnpj">CNPJ</option>
+            </select>
+          </div>
+
           <div class="flex-1 min-w-[240px]">
             <label class="label p-0 mb-2">
-              <span class="label-text font-medium">CPF do Beneficiário</span>
+              <span class="label-text font-medium">Documento do Beneficiário</span>
             </label>
             <input
               inputmode="numeric"
               type="text"
               class="input input-bordered w-full"
-              placeholder="___.___.___-__"
-              :value="cpfMascarado"
-              @input="onCpfInput"
+              :placeholder="documentoPlaceholder"
+              :value="documentoMascarado"
+              @input="onDocumentoInput"
               autocomplete="off"
             />
           </div>
@@ -54,7 +64,7 @@
           <div class="flex justify-between items-center mb-4">
             <div>
               <h2 class="text-lg font-semibold">{{ credito.nome }}</h2>
-              <p class="text-sm text-base-content/60">{{ formatarCpf(credito.cpf) }}</p>
+              <p class="text-sm text-base-content/60">{{ formatarDocumento(credito.cpf) }}</p>
             </div>
 
             <div class="text-right">
@@ -98,7 +108,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <span>Nenhum crédito disponível para este CPF.</span>
+        <span>Nenhum crédito disponível para este documento.</span>
       </div>
     </Transition>
 
@@ -116,7 +126,7 @@
         <div class="py-4">
           <div class="mb-4">
             <p class="font-medium">{{ credito?.nome }}</p>
-            <p class="text-sm text-base-content/60">{{ formatarCpf(credito?.cpf ?? '') }}</p>
+            <p class="text-sm text-base-content/60">{{ formatarDocumento(credito?.cpf ?? '') }}</p>
           </div>
 
           <div class="bg-base-200 p-4 rounded-lg">
@@ -190,7 +200,10 @@ definePageMeta({ layout: 'default', middleware: 'auth' })
 const credito = ref<CreditoRow | null>(null)
 const usos = ref<UsoRow[]>([])
 const valorPorCopia = ref<number | null>(null)
-const cpfDigits = ref('')
+type TipoDocumento = 'cpf' | 'cnpj'
+
+const tipoDocumento = ref<TipoDocumento>('cpf')
+const documentoDigits = ref('')
 const buscou = ref(false)
 const numCopias = ref(1)
 const modalBaixaRef = ref<HTMLDialogElement | null>(null)
@@ -233,30 +246,51 @@ const podeRegistrarConfirmacao = computed(() => {
   return valorConsumoBaixa.value <= Number(credito.value?.saldo ?? 0)
 })
 
-const cpfMascarado = computed(() => formatInputCpf(cpfDigits.value))
+const documentoMaxLength = computed(() => (tipoDocumento.value === 'cpf' ? 11 : 14))
+const documentoPlaceholder = computed(() => (tipoDocumento.value === 'cpf' ? '___.___.___-__' : '__.___.___/____-__'))
+const documentoMascarado = computed(() => formatInputDocumento(documentoDigits.value, tipoDocumento.value))
 
-function formatInputCpf(digits: string): string {
-  const d = digits.replace(/\D/g, '').slice(0, 11)
+function formatInputDocumento(digits: string, tipo: TipoDocumento): string {
+  const d = digits.replace(/\D/g, '').slice(0, tipo === 'cpf' ? 11 : 14)
+
+  if (tipo === 'cnpj') {
+    if (d.length <= 2) return d
+    if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`
+    if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`
+    if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`
+    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12, 14)}`
+  }
+
   if (d.length <= 3) return d
   if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`
   if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
   return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9, 11)}`
 }
 
-function formatarCpf(cpf: string): string {
-  const digits = cpf.replace(/\D/g, '')
-  if (digits.length !== 11) return cpf
-  return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+function formatarDocumento(documento: string): string {
+  const digits = documento.replace(/\D/g, '')
+  if (digits.length === 11) {
+    return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+  }
+  if (digits.length === 14) {
+    return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')
+  }
+  return documento
 }
 
-function onCpfInput(ev: Event): void {
+function onTipoDocumentoChange(): void {
+  documentoDigits.value = documentoDigits.value.slice(0, documentoMaxLength.value)
+  erroConsulta.value = null
+}
+
+function onDocumentoInput(ev: Event): void {
   const target = ev.target as HTMLInputElement
-  cpfDigits.value = target.value.replace(/\D/g, '').slice(0, 11)
+  documentoDigits.value = target.value.replace(/\D/g, '').slice(0, documentoMaxLength.value)
   erroConsulta.value = null
 
-  if (cpfDigits.value.length === 11) {
+  if (documentoDigits.value.length === documentoMaxLength.value) {
     buscar()
-  } else if (cpfDigits.value.length === 0) {
+  } else if (documentoDigits.value.length === 0) {
     credito.value = null
     usos.value = []
     buscou.value = false
@@ -273,11 +307,11 @@ async function carregarConfig() {
   }
 }
 
-async function carregarCredito(cpf: string) {
+async function carregarCredito(documento: string) {
   erroConsulta.value = null
   try {
     const row = await $fetch<CreditoRow>(
-      `/api/reprografia/creditos?cpf=${encodeURIComponent(cpf)}`,
+      `/api/reprografia/creditos?cpf=${encodeURIComponent(documento)}`,
     )
     credito.value = row
   } catch (err: any) {
@@ -285,18 +319,18 @@ async function carregarCredito(cpf: string) {
     if (statusCode === 422) {
       credito.value = null
       usos.value = []
-      erroConsulta.value = 'Não há créditos cadastrados para este CPF.'
+      erroConsulta.value = 'Não há créditos cadastrados para este documento.'
       return
     }
     credito.value = null
     usos.value = []
-    erroConsulta.value = 'Erro ao consultar CPF. Tente novamente.'
+    erroConsulta.value = 'Erro ao consultar documento. Tente novamente.'
   }
 }
 
-async function carregarUsos(cpf?: string) {
+async function carregarUsos(documento?: string) {
   try {
-    const path = cpf ? `/api/reprografia/usos?cpf=${encodeURIComponent(cpf)}` : '/api/reprografia/usos'
+    const path = documento ? `/api/reprografia/usos?cpf=${encodeURIComponent(documento)}` : '/api/reprografia/usos'
     const rows = await $fetch<UsoRow[]>(path)
     usos.value = rows
   } catch {
@@ -304,15 +338,15 @@ async function carregarUsos(cpf?: string) {
   }
 }
 
-async function handleConsultarCpf(cpfDigits: string) {
+async function handleConsultarCpf(documentoDigits: string) {
   carregandoConsulta.value = true
   erroConsulta.value = null
   buscou.value = false
 
   try {
-    await carregarCredito(cpfDigits)
+    await carregarCredito(documentoDigits)
     if (credito.value) {
-      await carregarUsos(cpfDigits)
+      await carregarUsos(documentoDigits)
     } else {
       usos.value = []
     }
@@ -323,11 +357,13 @@ async function handleConsultarCpf(cpfDigits: string) {
 }
 
 async function buscar() {
-  if (cpfDigits.value.length !== 11) {
-    erroConsulta.value = 'Informe um CPF válido (11 dígitos)'
+  if (documentoDigits.value.length !== documentoMaxLength.value) {
+    erroConsulta.value = tipoDocumento.value === 'cpf'
+      ? 'Informe um CPF válido (11 dígitos)'
+      : 'Informe um CNPJ válido (14 dígitos)'
     return
   }
-  await handleConsultarCpf(cpfDigits.value)
+  await handleConsultarCpf(documentoDigits.value)
 }
 
 function abrirModalBaixa() {

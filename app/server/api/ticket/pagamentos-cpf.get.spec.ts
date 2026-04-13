@@ -33,7 +33,7 @@ describe('ticket/pagamentos-cpf.get', () => {
 
     await expect(handler({} as never)).rejects.toMatchObject({
       statusCode: 400,
-      statusMessage: 'CPF deve ter 11 dígitos',
+      statusMessage: 'CPF/CNPJ deve ter 11 ou 14 dígitos',
     })
   })
 

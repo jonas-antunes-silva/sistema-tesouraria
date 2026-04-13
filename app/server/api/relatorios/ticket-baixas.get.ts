@@ -16,7 +16,7 @@ const schema = z.object({
     .string()
     .optional()
     .transform((v) => (v ? v.replace(/\D/g, '') : undefined))
-    .refine((v) => (v ? v.length === 11 : true), 'CPF inválido'),
+    .refine((v) => (v ? v.length === 11 || v.length === 14 : true), 'CPF/CNPJ inválido'),
 }).refine(
   (v) => !v.data_inicio || !v.data_fim || v.data_inicio <= v.data_fim,
   'Data inicial não pode ser maior que data final',

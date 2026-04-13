@@ -5,17 +5,27 @@
     <div class="card bg-base-100 shadow-xl mb-6">
       <div class="card-body">
         <div class="flex items-end gap-4 flex-wrap">
+          <div class="w-28">
+            <label class="label p-0 mb-2">
+              <span class="label-text font-medium">Tipo</span>
+            </label>
+            <select v-model="tipoDocumento" class="select select-bordered w-full" @change="onTipoDocumentoChange">
+              <option value="cpf">CPF</option>
+              <option value="cnpj">CNPJ</option>
+            </select>
+          </div>
+
           <div class="flex-1 min-w-[240px]">
             <label class="label p-0 mb-2">
-              <span class="label-text font-medium">CPF do Beneficiário</span>
+              <span class="label-text font-medium">Documento do Beneficiário</span>
             </label>
             <input
               inputmode="numeric"
               type="text"
               class="input input-bordered w-full"
-              placeholder="___.___.___-__"
-              :value="cpfMascarado"
-              @input="onCpfInput"
+              :placeholder="documentoPlaceholder"
+              :value="documentoMascarado"
+              @input="onDocumentoInput"
               autocomplete="off"
             />
           </div>
@@ -48,7 +58,7 @@
           <div class="flex justify-between items-center mb-4">
             <div>
               <h2 class="text-lg font-semibold">{{ resumo.nome }}</h2>
-              <p class="text-sm text-base-content/60">{{ formatarCpf(resumo.cpf) }}</p>
+              <p class="text-sm text-base-content/60">{{ formatarDocumento(resumo.cpf) }}</p>
             </div>
             <div class="text-right">
               <p class="text-sm text-base-content/60">Saldo disponível</p>
@@ -112,7 +122,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
         </svg>
-        <span>Nenhum crédito disponível para este CPF.</span>
+        <span>Nenhum crédito disponível para este documento.</span>
       </div>
     </Transition>
 
@@ -134,7 +144,7 @@
               <tr>
                 <th>Horário</th>
                 <th>Entregue por:</th>
-                <th>CPF</th>
+                <th>CPF/CNPJ</th>
                 <th>Beneficiário</th>
                 <th>Tipo</th>
                 <th>Qtd</th>
@@ -147,7 +157,7 @@
               <tr v-for="t in transacoes" :key="t.id">
                 <td>{{ formatarDataHora(t.criado_em) }}</td>
                 <td>{{ t.responsavel_nome }}</td>
-                <td>{{ t.codigo_contribuinte ? formatarCpf(t.codigo_contribuinte) : '—' }}</td>
+                <td>{{ t.codigo_contribuinte ? formatarDocumento(t.codigo_contribuinte) : '—' }}</td>
                 <td>{{ t.nome_contribuinte || '—' }}</td>
                 <td class="capitalize">{{ t.tipo }}</td>
                 <td>{{ t.quantidade }}</td>
@@ -155,14 +165,14 @@
                 <td>{{ formatarMoeda(t.saldo_depois || 0) }}</td>
                 <td>
                   <div v-if="t.estornado" class="text-xs">
-                    <span class="badge badge-warning">Estornado</span>
+                    <span class="badge badge-warning normal-case text-xs font-medium">Estornado</span>
                   </div>
                   <button
                     v-else
-                    class="btn btn-error btn-xs"
+                    class="btn btn-neutral btn-xs"
                     @click="abrirModalEstorno(t)"
                   >
-                    Estorno
+                    Realizar estorno
                   </button>
                 </td>
               </tr>
@@ -179,7 +189,7 @@
         <div class="py-4">
           <div class="mb-4">
             <p class="font-medium">{{ resumo?.nome }}</p>
-            <p class="text-sm text-base-content/60">{{ formatarCpf(resumo?.cpf || '') }}</p>
+            <p class="text-sm text-base-content/60">{{ formatarDocumento(resumo?.cpf || '') }}</p>
           </div>
 
           <div class="form-control mb-4">
@@ -259,7 +269,7 @@
 
         <div v-if="transacaoEstorno" class="py-4 space-y-2">
           <p class="text-sm">Beneficiário: <strong>{{ transacaoEstorno.nome_contribuinte || '—' }}</strong></p>
-          <p class="text-sm">CPF: <strong>{{ transacaoEstorno.codigo_contribuinte ? formatarCpf(transacaoEstorno.codigo_contribuinte) : '—' }}</strong></p>
+          <p class="text-sm">Documento: <strong>{{ transacaoEstorno.codigo_contribuinte ? formatarDocumento(transacaoEstorno.codigo_contribuinte) : '—' }}</strong></p>
           <p class="text-sm">Consumo registrado: <strong>{{ formatarMoeda(transacaoEstorno.valor_consumido || 0) }}</strong></p>
 
           <div class="form-control mt-3">
@@ -282,7 +292,7 @@
 
         <div class="modal-action">
           <button class="btn btn-ghost" :disabled="salvandoEstorno" @click="fecharModalEstorno">Cancelar</button>
-          <button class="btn btn-error" :disabled="salvandoEstorno || motivoEstorno.trim().length < 3" @click="confirmarEstorno">
+          <button class="btn btn-neutral" :disabled="salvandoEstorno || motivoEstorno.trim().length < 3" @click="confirmarEstorno">
             <span v-if="salvandoEstorno" class="loading loading-spinner loading-sm"></span>
             Confirmar Estorno
           </button>
@@ -332,7 +342,10 @@ interface Transacao {
   estornado_por_nome: string | null
 }
 
-const cpfDigits = ref('')
+type TipoDocumento = 'cpf' | 'cnpj'
+
+const tipoDocumento = ref<TipoDocumento>('cpf')
+const documentoDigits = ref('')
 const resumo = ref<TicketResumo | null>(null)
 const transacoes = ref<Transacao[]>([])
 const buscou = ref(false)
@@ -385,24 +398,41 @@ const saldoAposEntrega = computed(() => {
   return Number(Math.max(0, saldo - valorConsumoEntrega.value).toFixed(2))
 })
 
-function formatInputCpf(digits: string): string {
-  const d = digits.replace(/\D/g, '').slice(0, 11)
+const documentoMaxLength = computed(() => (tipoDocumento.value === 'cpf' ? 11 : 14))
+const documentoPlaceholder = computed(() => (tipoDocumento.value === 'cpf' ? '___.___.___-__' : '__.___.___/____-__'))
+
+function formatInputDocumento(digits: string, tipo: TipoDocumento): string {
+  const d = digits.replace(/\D/g, '').slice(0, tipo === 'cpf' ? 11 : 14)
+
+  if (tipo === 'cnpj') {
+    if (d.length <= 2) return d
+    if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`
+    if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`
+    if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`
+    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12, 14)}`
+  }
+
   if (d.length <= 3) return d
   if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`
   if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
   return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9, 11)}`
 }
 
-const cpfMascarado = computed(() => formatInputCpf(cpfDigits.value))
+const documentoMascarado = computed(() => formatInputDocumento(documentoDigits.value, tipoDocumento.value))
 
-function onCpfInput(ev: Event) {
+function onTipoDocumentoChange() {
+  documentoDigits.value = documentoDigits.value.slice(0, documentoMaxLength.value)
+  erroValidacao.value = null
+}
+
+function onDocumentoInput(ev: Event) {
   const target = ev.target as HTMLInputElement
-  cpfDigits.value = target.value.replace(/\D/g, '').slice(0, 11)
+  documentoDigits.value = target.value.replace(/\D/g, '').slice(0, documentoMaxLength.value)
   erroValidacao.value = null
   
-  if (cpfDigits.value.length === 11) {
+  if (documentoDigits.value.length === documentoMaxLength.value) {
     buscar()
-  } else if (cpfDigits.value.length === 0) {
+  } else if (documentoDigits.value.length === 0) {
     resumo.value = null
     buscou.value = false
   }
@@ -431,8 +461,10 @@ function ajustarTipoPessoaPorSaldo() {
 }
 
 async function buscar() {
-  if (cpfDigits.value.length !== 11) {
-    erroValidacao.value = 'Informe um CPF válido (11 dígitos)'
+  if (documentoDigits.value.length !== documentoMaxLength.value) {
+    erroValidacao.value = tipoDocumento.value === 'cpf'
+      ? 'Informe um CPF válido (11 dígitos)'
+      : 'Informe um CNPJ válido (14 dígitos)'
     return
   }
   
@@ -441,7 +473,7 @@ async function buscar() {
   buscou.value = false
   try {
     const data = await $fetch<TicketResumo>('/api/ticket/pagamentos-cpf', {
-      query: { cpf: cpfDigits.value },
+      query: { cpf: documentoDigits.value },
     })
     resumo.value = data
     ajustarTipoPessoaPorSaldo()
@@ -548,8 +580,15 @@ async function confirmarEstorno(): Promise<void> {
   }
 }
 
-function formatarCpf(cpf: string): string {
-  return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+function formatarDocumento(documento: string): string {
+  const digits = documento.replace(/\D/g, '')
+  if (digits.length === 11) {
+    return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+  }
+  if (digits.length === 14) {
+    return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')
+  }
+  return documento || '—'
 }
 
 function formatarData(data: string): string {

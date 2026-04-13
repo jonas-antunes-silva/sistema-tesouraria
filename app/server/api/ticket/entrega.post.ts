@@ -9,7 +9,10 @@ import {
 } from '../../utils/livroCaixa'
 
 const BodySchema = z.object({
-  cpf: z.string().regex(/^\d{11}$/, 'CPF deve ter 11 dígitos'),
+  cpf: z
+    .string()
+    .transform((v) => v.replace(/\D/g, ''))
+    .refine((digits) => digits.length === 11 || digits.length === 14, 'CPF/CNPJ deve ter 11 ou 14 dígitos'),
   tipo: z.enum(['estudante', 'servidor', 'visitante']),
   quantidade: z.any().transform(v => Number(v)).pipe(z.number().int().min(1)),
 })
@@ -70,7 +73,7 @@ export default defineEventHandler(async (event) => {
 
       const nomeContribuinte = nomeResult.rows[0]?.nome_contribuinte?.trim()
       if (!nomeContribuinte) {
-        throw createError({ statusCode: 404, statusMessage: 'CPF sem pagamentos de ticket' })
+        throw createError({ statusCode: 404, statusMessage: 'Documento sem pagamentos de ticket' })
       }
 
       await travarContaLivroCaixa(client, 'ticket', parsed.data.cpf)

@@ -24,16 +24,22 @@
 
           <div class="form-control">
             <label class="label p-0 mb-2">
-              <span class="label-text font-medium">CPF</span>
+              <span class="label-text font-medium">Documento</span>
             </label>
-            <input
-              inputmode="numeric"
-              type="text"
-              class="input input-bordered"
-              placeholder="___.___.___-__"
-              :value="cpfMascarado"
-              @input="onCpfInput"
-            />
+            <div class="join w-full">
+              <select v-model="tipoDocumento" class="select select-bordered join-item w-24" @change="onTipoDocumentoChange">
+                <option value="cpf">CPF</option>
+                <option value="cnpj">CNPJ</option>
+              </select>
+              <input
+                inputmode="numeric"
+                type="text"
+                class="input input-bordered join-item flex-1"
+                :placeholder="documentoPlaceholder"
+                :value="documentoMascarado"
+                @input="onDocumentoInput"
+              />
+            </div>
           </div>
 
           <div class="form-control justify-end">
@@ -59,7 +65,7 @@
             <thead>
               <tr>
                 <th>Data/Hora</th>
-                <th>CPF</th>
+                <th>CPF/CNPJ</th>
                 <th>Nome</th>
                 <th>Nº Cópias</th>
                 <th>Valor Total</th>
@@ -71,9 +77,9 @@
               <tr v-if="rows.length === 0">
                 <td colspan="7" class="text-center text-base-content/60 py-8">Nenhum registro encontrado</td>
               </tr>
-              <tr v-for="u in rows" :key="u.id">
+              <tr v-for="u in rowsPaginados" :key="u.id">
                 <td>{{ formatarDataHora(u.registrado_em) }}</td>
-                <td>{{ formatarCpf(u.cpf) }}</td>
+                <td>{{ formatarDocumento(u.cpf) }}</td>
                 <td>{{ u.nome }}</td>
                 <td>{{ u.num_copias }}</td>
                 <td>{{ formatarMoeda(u.valor_total) }}</td>
@@ -85,6 +91,23 @@
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="mt-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div class="text-sm text-base-content/70">
+            Exibindo {{ inicioPagina }}-{{ fimPagina }} de {{ totalRegistros }} registro(s)
+          </div>
+
+          <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm">Itens por página</span>
+            <select v-model.number="itensPorPagina" class="select select-bordered select-sm w-24">
+              <option v-for="opcao in opcoesItensPorPagina" :key="opcao" :value="opcao">{{ opcao }}</option>
+            </select>
+
+            <button class="btn btn-sm" :disabled="paginaAtual <= 1" @click="paginaAtual -= 1">Anterior</button>
+            <span class="text-sm px-1">Página {{ paginaAtual }} de {{ totalPaginas }}</span>
+            <button class="btn btn-sm" :disabled="paginaAtual >= totalPaginas" @click="paginaAtual += 1">Próxima</button>
+          </div>
         </div>
       </div>
     </div>
@@ -113,27 +136,62 @@ const carregando = ref(false)
 const erro = ref<string | null>(null)
 const hoje = new Date().toISOString().slice(0, 10)
 const filtroData = ref<[string, string] | null>([hoje, hoje])
-const cpfDigits = ref('')
+type TipoDocumento = 'cpf' | 'cnpj'
 
-const cpfMascarado = computed(() => formatInputCpf(cpfDigits.value))
+const tipoDocumento = ref<TipoDocumento>('cpf')
+const documentoDigits = ref('')
+const opcoesItensPorPagina = [10, 20, 30, 40, 50, 100]
+const itensPorPagina = ref(30)
+const paginaAtual = ref(1)
 
-function formatInputCpf(digits: string): string {
-  const d = digits.replace(/\D/g, '').slice(0, 11)
+const totalRegistros = computed(() => rows.value.length)
+const totalPaginas = computed(() => Math.max(1, Math.ceil(totalRegistros.value / itensPorPagina.value)))
+const inicioPagina = computed(() => (totalRegistros.value === 0 ? 0 : (paginaAtual.value - 1) * itensPorPagina.value + 1))
+const fimPagina = computed(() => Math.min(totalRegistros.value, paginaAtual.value * itensPorPagina.value))
+const rowsPaginados = computed(() => {
+  const inicio = (paginaAtual.value - 1) * itensPorPagina.value
+  return rows.value.slice(inicio, inicio + itensPorPagina.value)
+})
+
+const documentoMaxLength = computed(() => (tipoDocumento.value === 'cpf' ? 11 : 14))
+const documentoPlaceholder = computed(() => (tipoDocumento.value === 'cpf' ? '___.___.___-__' : '__.___.___/____-__'))
+const documentoMascarado = computed(() => formatInputDocumento(documentoDigits.value, tipoDocumento.value))
+
+function formatInputDocumento(digits: string, tipo: TipoDocumento): string {
+  const d = digits.replace(/\D/g, '').slice(0, tipo === 'cpf' ? 11 : 14)
+
+  if (tipo === 'cnpj') {
+    if (d.length <= 2) return d
+    if (d.length <= 5) return `${d.slice(0, 2)}.${d.slice(2)}`
+    if (d.length <= 8) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5)}`
+    if (d.length <= 12) return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8)}`
+    return `${d.slice(0, 2)}.${d.slice(2, 5)}.${d.slice(5, 8)}/${d.slice(8, 12)}-${d.slice(12, 14)}`
+  }
+
   if (d.length <= 3) return d
   if (d.length <= 6) return `${d.slice(0, 3)}.${d.slice(3)}`
   if (d.length <= 9) return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6)}`
   return `${d.slice(0, 3)}.${d.slice(3, 6)}.${d.slice(6, 9)}-${d.slice(9, 11)}`
 }
 
-function onCpfInput(ev: Event): void {
-  const target = ev.target as HTMLInputElement
-  cpfDigits.value = target.value.replace(/\D/g, '').slice(0, 11)
+function onTipoDocumentoChange(): void {
+  documentoDigits.value = documentoDigits.value.slice(0, documentoMaxLength.value)
 }
 
-function formatarCpf(cpf: string): string {
-  const digits = cpf.replace(/\D/g, '')
-  if (digits.length !== 11) return cpf || '—'
-  return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+function onDocumentoInput(ev: Event): void {
+  const target = ev.target as HTMLInputElement
+  documentoDigits.value = target.value.replace(/\D/g, '').slice(0, documentoMaxLength.value)
+}
+
+function formatarDocumento(documento: string): string {
+  const digits = documento.replace(/\D/g, '')
+  if (digits.length === 11) {
+    return digits.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')
+  }
+  if (digits.length === 14) {
+    return digits.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5')
+  }
+  return documento || '—'
 }
 
 function formatarDataHora(data: string): string {
@@ -181,17 +239,16 @@ function obterPeriodoSelecionado(): { dataInicio?: string; dataFim?: string } {
 
 async function buscar(): Promise<void> {
   erro.value = null
+  paginaAtual.value = 1
 
-  if (cpfDigits.value && cpfDigits.value.length !== 11) {
-    erro.value = 'Informe um CPF válido (11 dígitos).'
+  if (documentoDigits.value && documentoDigits.value.length !== documentoMaxLength.value) {
+    erro.value = tipoDocumento.value === 'cpf'
+      ? 'Informe um CPF válido (11 dígitos).'
+      : 'Informe um CNPJ válido (14 dígitos).'
     return
   }
 
   const periodo = obterPeriodoSelecionado()
-  if (!periodo.dataInicio || !periodo.dataFim) {
-    erro.value = 'Selecione um período válido.'
-    return
-  }
 
   carregando.value = true
   try {
@@ -199,7 +256,7 @@ async function buscar(): Promise<void> {
       query: {
         data_inicio: periodo.dataInicio,
         data_fim: periodo.dataFim,
-        cpf: cpfDigits.value || undefined,
+        cpf: documentoDigits.value || undefined,
       },
     })
   } catch (err: unknown) {
@@ -213,6 +270,12 @@ async function buscar(): Promise<void> {
 }
 
 onMounted(buscar)
+
+watch([itensPorPagina, totalPaginas], () => {
+  if (paginaAtual.value > totalPaginas.value) {
+    paginaAtual.value = totalPaginas.value
+  }
+})
 </script>
 
 <style scoped>

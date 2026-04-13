@@ -11,9 +11,9 @@ import {
 const schema = z.object({
   cpf: z
     .string()
-    .min(1, 'CPF é obrigatório')
+    .min(1, 'Documento é obrigatório')
     .transform((v) => v.replace(/\D/g, ''))
-    .refine((digits) => digits.length === 11, 'CPF inválido'),
+    .refine((digits) => digits.length === 11 || digits.length === 14, 'CPF/CNPJ inválido'),
   num_copias: z
     .number()
     .int('num_copias deve ser inteiro')
@@ -71,7 +71,7 @@ export default defineEventHandler(async (event) => {
     if (resumo.creditos <= 0) {
       throw createError({
         statusCode: 422,
-        statusMessage: 'CPF não possui créditos cadastrados',
+        statusMessage: 'Documento não possui créditos cadastrados',
       })
     }
 

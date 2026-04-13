@@ -4,7 +4,10 @@ import { query } from '../../utils/db'
 import { obterResumoLivroCaixa } from '../../utils/livroCaixa'
 
 const schema = z.object({
-  cpf: z.string().regex(/^\d{11}$/, 'CPF deve ter 11 dígitos'),
+  cpf: z
+    .string()
+    .transform((v) => v.replace(/\D/g, ''))
+    .refine((digits) => digits.length === 11 || digits.length === 14, 'CPF/CNPJ deve ter 11 ou 14 dígitos'),
 })
 
 export default defineEventHandler(async (event) => {
