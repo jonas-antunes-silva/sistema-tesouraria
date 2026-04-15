@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
     const totalCreditosResult = await query<{ total: string }>(
       `SELECT COALESCE(SUM(sp.valor_total), 0)::text AS total
        FROM sisgru_pagamentos sp
-       WHERE regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $1
+       WHERE regexp_replace(sp.codigo_contribuinte, '\\\\D', '', 'g') = $1
          AND COALESCE(sp.servico_id_retificado, sp.servico_id) = 14671
          AND sp.situacao IN ('CO', 'CG')`,
       [parsed.data.cpf],
@@ -52,11 +52,12 @@ export default defineEventHandler(async (event) => {
     const totalConsumidoResult = await query<{ total: string }>(
       `SELECT COALESCE(SUM(te.valor_consumido), 0)::text AS total
        FROM ticket_entregas te
-       WHERE regexp_replace(te.cpf, '\\D', '', 'g') = $1
+       WHERE regexp_replace(te.cpf, '\\\\D', '', 'g') = $1
          AND te.estornado = false`,
       [parsed.data.cpf],
     )
 
+    // Saldo vem do livro‑caixa (fonte de verdade usada na validação de entrega)
     const resumo = await obterResumoLivroCaixa({ query }, 'ticket', parsed.data.cpf)
     const totalCreditos = Number(totalCreditosResult.rows[0]?.total ?? 0)
     const totalConsumido = Number(totalConsumidoResult.rows[0]?.total ?? 0)

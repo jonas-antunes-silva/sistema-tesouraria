@@ -41,6 +41,7 @@ describe('ticket/pagamentos-cpf.get', () => {
     getQueryMock.mockReturnValue({ cpf: '12345678901' })
 
     queryMock
+      // 1ª query: lista de pagamentos SISGRU
       .mockResolvedValueOnce({
         rows: [
           {
@@ -53,8 +54,11 @@ describe('ticket/pagamentos-cpf.get', () => {
           },
         ],
       })
+      // 2ª query: total de créditos (sisgru_pagamentos)
       .mockResolvedValueOnce({ rows: [{ total: '100.00' }] })
+      // 3ª query: total consumido (ticket_entregas)
       .mockResolvedValueOnce({ rows: [{ total: '30.00' }] })
+      // 4ª query: obterResumoLivroCaixa (financeiro_lancamentos)
       .mockResolvedValueOnce({ rows: [{ creditos: '100.00', debitos: '30.00' }] })
 
     const result = await handler({} as never)

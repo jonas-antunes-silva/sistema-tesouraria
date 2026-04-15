@@ -116,70 +116,19 @@ export default defineEventHandler(async (event) => {
     const moduloAnterior = moduloPorServicoId(servicoIdAnterior)
     const moduloNovo = moduloPorServicoId(novoServicoId)
 
-    // Se sair de impressão, estorna o crédito local da reprografia.
-    if (moduloAnterior === 'reprografia' && moduloNovo !== 'reprografia') {
-      await travarContaLivroCaixa(client, 'reprografia', cpfDigits)
-      const resumoRepro = await obterResumoLivroCaixa(client, 'reprografia', cpfDigits)
-      const saldoAtual = resumoRepro.saldo
+    if (moduloAnterior && moduloAnterior !== moduloNovo) {
+      await travarContaLivroCaixa(client, moduloAnterior, cpfDigits)
+      const resumoConta = await obterResumoLivroCaixa(client, moduloAnterior, cpfDigits)
+      const saldoAtual = resumoConta.saldo
+      
       if (saldoAtual < valorPagamento) {
+        const mensagemErro = moduloAnterior === 'reprografia'
+          ? 'Retificação bloqueada: crédito de impressão já utilizado'
+          : 'Retificação bloqueada: o saldo atual de ticket não cobre o valor deste pagamento'
+
         throw createError({
           statusCode: 422,
-          statusMessage: 'Retificação bloqueada: crédito de impressão já utilizado',
-        })
-      }
-    }
-
-    // Se sair de ticket, bloqueia somente se este pagamento já tiver consumo FIFO.
-    if (servicoIdAnterior === 14671 && novoServicoId !== 14671) {
-      const totalConsumidoResult = await client.query<{ total: string }>(
-        `SELECT COALESCE(SUM(te.valor_consumido), 0)::text AS total
-         FROM ticket_entregas te
-         WHERE regexp_replace(te.cpf, '\\D', '', 'g') = $1
-           AND te.estornado = false`,
-        [cpfDigits],
-      )
-
-      const totalConsumido = toNumber(totalConsumidoResult.rows[0]?.total ?? '0')
-
-      const consumoPagamentoResult = await client.query<{ consumido_no_pagamento: string }>(
-        `WITH creditos AS (
-           SELECT
-             sp.id,
-             sp.valor_total::numeric AS valor,
-             SUM(sp.valor_total::numeric) OVER (
-               ORDER BY sp.data ASC, sp.id ASC
-               ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
-             ) AS acumulado_ate_atual
-           FROM sisgru_pagamentos sp
-           WHERE regexp_replace(sp.codigo_contribuinte, '\\D', '', 'g') = $1
-             AND sp.situacao IN ('CO', 'CG')
-             AND COALESCE(sp.servico_id_retificado, sp.servico_id) = 14671
-         ),
-         alvo AS (
-           SELECT
-             id,
-             valor,
-             acumulado_ate_atual - valor AS acumulado_antes,
-             acumulado_ate_atual
-           FROM creditos
-           WHERE id = $2
-         )
-         SELECT GREATEST(
-                  0::numeric,
-                  LEAST($3::numeric, acumulado_ate_atual) - acumulado_antes
-                )::text AS consumido_no_pagamento
-         FROM alvo`,
-        [cpfDigits, pagamentoId, totalConsumido.toFixed(2)],
-      )
-
-      const consumidoNoPagamento = toNumber(
-        consumoPagamentoResult.rows[0]?.consumido_no_pagamento ?? '0',
-      )
-
-      if (consumidoNoPagamento > 0) {
-        throw createError({
-          statusCode: 422,
-          statusMessage: 'Retificação bloqueada: este pagamento de ticket já foi consumido',
+          statusMessage: mensagemErro,
         })
       }
     }
