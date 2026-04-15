@@ -21,10 +21,10 @@ export default defineNitroPlugin(() => {
   let executandoGrus = false
 
   console.log(
-    '[sisgruCron] Agendamentos SISGRU ativos: pagamentos hoje a cada 1 min; pagamentos D-1..D-5 a cada 5 min; GRUs últimos 5 dias a cada 10 min.',
+    '[sisgruCron] Agendamentos SISGRU ativos: pagamentos hoje a cada 30 seg; pagamentos D-1..D-5 a cada 5 min; GRUs últimos 5 dias a cada 10 min.',
   )
 
-  cron.schedule('* * * * *', async () => {
+  cron.schedule('*/30 * * * * *', async () => {
     if (executandoHoje) {
       console.log('[sisgruCron] Sync dia atual ignorada: execução anterior ainda em andamento.')
       return
