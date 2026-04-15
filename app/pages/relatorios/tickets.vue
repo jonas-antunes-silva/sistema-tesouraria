@@ -72,7 +72,7 @@
                 <th>Qtd</th>
                 <th>Consumo</th>
                 <th>Saldo após</th>
-                <th>Status</th>
+                <th>Status de Estorno</th>
               </tr>
             </thead>
             <tbody>
@@ -89,8 +89,16 @@
                 <td>{{ formatarMoeda(t.valor_consumido || 0) }}</td>
                 <td>{{ formatarMoeda(t.saldo_depois || 0) }}</td>
                 <td>
-                  <span v-if="t.estornado" class="badge badge-warning">Estornado</span>
-                  <span v-else class="badge badge-success">Ativo</span>
+                  <div v-if="t.estornado" class="text-xs">
+                    <span class="badge badge-warning normal-case text-xs font-medium">Estornado</span>
+                  </div>
+                  <button
+                    v-else
+                    class="btn btn-neutral btn-xs"
+                    @click="abrirModalEstorno(t)"
+                  >
+                    Realizar estorno
+                  </button>
                 </td>
               </tr>
             </tbody>
@@ -115,6 +123,8 @@
         </div>
       </div>
     </div>
+    
+    <TicketModalEstorno ref="modalEstornoRef" @estornado="buscar" />
   </div>
 </template>
 
@@ -142,6 +152,7 @@ const carregando = ref(false)
 const erro = ref<string | null>(null)
 const hoje = new Date().toISOString().slice(0, 10)
 const filtroData = ref<[string, string] | null>([hoje, hoje])
+const modalEstornoRef = ref<any>(null)
 type TipoDocumento = 'cpf' | 'cnpj'
 
 const tipoDocumento = ref<TipoDocumento>('cpf')
@@ -271,6 +282,10 @@ async function buscar(): Promise<void> {
   } finally {
     carregando.value = false
   }
+}
+
+function abrirModalEstorno(transacao: TicketRow): void {
+  modalEstornoRef.value?.abrir(transacao)
 }
 
 onMounted(buscar)

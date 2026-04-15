@@ -277,6 +277,7 @@ function badgeSituacao(s: string): string {
 
 function traduzirSituacao(codigo: string): string {
   const map: Record<string, string> = {
+    CR: 'Criado',
     IN: 'Iniciado',
     SU: 'Submetido',
     CO: 'Concluído',
@@ -363,7 +364,7 @@ async function carregarFiltros(): Promise<void> {
     opcoesTipoPagamento.value = payload.tiposPagamento
   } catch {
     opcoesServico.value = []
-    opcoesSituacao.value = ['IN', 'SU', 'CO', 'CG', 'ER', 'CA', 'RE']
+    opcoesSituacao.value = ['CR', 'IN', 'SU', 'CO', 'CG', 'ER', 'CA', 'RE']
     opcoesTipoPagamento.value = []
   }
 }
