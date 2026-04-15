@@ -32,11 +32,41 @@
             </div>
           </th>
           <th class="w-32">Valor Total (R$)</th>
-          <th class="w-28">Situação</th>
+          <th class="w-32">
+            <div class="dropdown dropdown-hover dropdown-bottom dropdown-end">
+              <label tabindex="0" class="flex items-center gap-1 cursor-pointer">
+                Situação
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+              </label>
+              <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-48 font-normal">
+                <li v-for="sit in situacoesUnicas" :key="sit.id">
+                  <label class="flex items-center gap-2 cursor-pointer py-1">
+                    <input
+                      type="checkbox"
+                      class="checkbox checkbox-sm"
+                      :checked="situacoesSelecionadas.includes(sit.id)"
+                      @change="toggleSituacao(sit.id)"
+                    />
+                    <span class="text-sm font-normal">{{ sit.nome }}</span>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </th>
           <th class="w-40">Tipo Pagamento</th>
-          <th class="w-24">Data SISGRU</th>
-          <!-- <th class="w-24">Data PagTesouro</th> -->
-          <th class="w-36">Data PSP</th>
+          <th class="w-32">
+            <div tabindex="0" class="flex items-center gap-1 cursor-pointer select-none text-base-content hover:text-primary transition-colors" @click="toggleOrdenacaoData">
+              Data
+              <svg v-if="ordemData === 'desc'" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+              </svg>
+              <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+              </svg>
+            </div>
+          </th>
           <!-- <th class="w-36">Criação</th>
           <th class="w-36">Sync</th> -->
         </tr>
@@ -91,9 +121,7 @@
               >{{ traducaoSituacao(p.situacao) }}</span>
             </td>
             <td>{{ p.tipo_pagamento_nome }}</td>
-            <td>{{ formatarData(p.data) }}</td>
-            <!-- <td>{{ formatarData(p.data_alteracao_situacao_pag_tesouro) }}</td> -->
-            <td>{{ formatarDataHora(p.data_pagamento_psp) }}</td>
+            <td>{{ formatarDataHora(p.data) }}</td>
             <!-- <td>{{ formatarDataHora(p.dt_criacao) }}</td>
             <td>{{ formatarDataHora(p.sincronizado_em) }}</td> -->
           </tr>
@@ -255,10 +283,56 @@ const servicosUnicos = computed<ServicoOpcao[]>(() => {
 })
 
 const servicosSelecionados = ref<string[]>(['14671', '16279'])
+const situacoesSelecionadas = ref<string[]>(['CO']) // Padrão: Apenas "Concluído"
 
-const pagamentosFiltrados = computed(() =>
-  props.pagamentos.filter(p => servicosSelecionados.value.includes(String(p.servico_id)))
-)
+interface SituacaoOpcao {
+  id: string
+  nome: string
+}
+
+const situacoesUnicas = computed<SituacaoOpcao[]>(() => {
+  const seen = new Set<string>()
+  const result: SituacaoOpcao[] = []
+  for (const p of props.pagamentos) {
+    const id = p.situacao
+    if (!seen.has(id)) {
+      seen.add(id)
+      result.push({ id, nome: traducaoSituacao(id) })
+    }
+  }
+  return result.sort((a, b) => a.nome.localeCompare(b.nome))
+})
+
+function toggleSituacao(id: string) {
+  const idx = situacoesSelecionadas.value.indexOf(id)
+  if (idx === -1) {
+    situacoesSelecionadas.value.push(id)
+  } else {
+    situacoesSelecionadas.value.splice(idx, 1)
+  }
+}
+
+const ordemData = ref<'asc' | 'desc'>('desc')
+
+function toggleOrdenacaoData() {
+  ordemData.value = ordemData.value === 'desc' ? 'asc' : 'desc'
+}
+
+const pagamentosFiltrados = computed(() => {
+  const filtrados = props.pagamentos.filter(p => 
+    servicosSelecionados.value.includes(String(p.servico_id)) &&
+    situacoesSelecionadas.value.includes(p.situacao)
+  )
+
+  return filtrados.sort((a, b) => {
+    const timeA = a.data ? new Date(a.data).getTime() : 0
+    const timeB = b.data ? new Date(b.data).getTime() : 0
+    if (timeA !== timeB) {
+      return ordemData.value === 'desc' ? timeB - timeA : timeA - timeB
+    }
+    return ordemData.value === 'desc' ? b.id - a.id : a.id - b.id
+  })
+})
 
 const somaTotal = computed(() =>
   pagamentosFiltrados.value
@@ -381,29 +455,17 @@ function formatarData(data: string): string {
 
 function formatarDataHora(data: string | null | undefined): string {
   if (!data) return '—'
-  const match = data.match(/^(\d{4})-(\d{2})-(\d{2})[T ](\d{2}):(\d{2})/)
-  if (match) {
-    const [, year, month, day, hour, minute] = match
-    let h = parseInt(hour, 10) - 3
-    let d = parseInt(day, 10)
-    let m = parseInt(month, 10)
-    let y = parseInt(year, 10)
-    if (h < 0) {
-      h += 24
-      d -= 1
-      if (d < 1) {
-        m -= 1
-        if (m < 1) {
-          m = 12
-          y -= 1
-        }
-        const diasNoMes = new Date(y, m, 0).getDate()
-        d = diasNoMes
-      }
-    }
-    return `${String(d).padStart(2, '0')}/${String(m).padStart(2, '0')}/${y} ${String(h).padStart(2, '0')}:${minute}`
-  }
-  return data
+  const d = new Date(data)
+  if (isNaN(d.getTime())) return data
+
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'UTC',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(d).replace(',', '')
 }
 
 function formatarCpf(cpf: string): string {
